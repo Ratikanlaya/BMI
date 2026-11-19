@@ -5,105 +5,158 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>คำนวณ BMI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#fff4ea; --card:#ffffff; --ink:#3a1f0f; --muted:#8a6a55; --line:#f6d9c0;
-    --accent:#f26b1d; --accent-soft:#ffe3cc; --warn-bg:#fff1d6; --err:#c9443b;
-    --c0:#3b5fa8; --c1:#5b8fd6; --c2:#3fa36b; --c3:#e0b23a; --c4:#e07b39; --c5:#c9443b;
+    --bg:#f5f6fa; --card:#ffffff; --ink:#202224; --muted:#7a7f8c; --line:#eceef3; --field:#f5f6fa;
+    --primary:#4880ff; --primary-soft:#ebf1ff; --shadow:0 4px 20px rgba(32,34,36,.05);
+    --t-purple:#8280ff; --t-purple-bg:#e5e4ff; --t-yellow:#f5b42a; --t-yellow-bg:#fef2d6;
+    --t-green:#2fbf7a; --t-green-bg:#d9f7e8; --t-orange:#ff9066; --t-orange-bg:#ffded1;
+    --warn-bg:#fff6e5; --err:#ef3826;
+    --c0:#3b5fa8; --c1:#5b8fd6; --c2:#2fbf7a; --c3:#f5b42a; --c4:#ff9066; --c5:#ef3826;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#1c130d; --card:#2a1c13; --ink:#fdeee2; --muted:#c29c80; --line:#4a3122;
-           --accent:#ff8a3d; --accent-soft:#4a2a14; --warn-bg:#3d2a10; --err:#ff7a6e; }
+    :root{ --bg:#1b2431; --card:#273142; --ink:#f2f4f8; --muted:#9aa3b5; --line:#343f52; --field:#323d4e;
+           --primary-soft:#2b3a5c; --shadow:none; --t-purple-bg:#33335c; --t-yellow-bg:#4a3e22; --t-green-bg:#1f4a3a;
+           --t-orange-bg:#4d3127; --warn-bg:#46391f; --err:#ff6b5c; }
   }
   *{box-sizing:border-box}
-  body{margin:0;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);
-       min-height:100vh;display:flex;justify-content:center;padding:32px 16px}
-  main{width:100%;max-width:520px}
-  h1{font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em;color:var(--accent)}
-  .sub{color:var(--muted);margin:0 0 24px;font-size:15px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 24px rgba(242,107,29,.10)}
-  .sec{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 2px}
-  .sec + *{margin-top:0}
-  hr{border:0;border-top:1px solid var(--line);margin:20px 0 14px}
-  .seg{display:flex;background:var(--accent-soft);border-radius:10px;padding:4px;gap:4px}
-  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:15px;
-              padding:9px;border-radius:7px;cursor:pointer}
-  .seg button.on{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
-  label{display:block;font-size:14px;font-weight:500;margin:14px 0 6px}
-  label small{color:var(--muted);font-weight:400}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:"Nunito Sans","IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+  .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- layout ---------- */
+  .app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+  aside{background:var(--card);border-right:1px solid var(--line);padding:24px 0;position:sticky;top:0;height:100vh;display:flex;flex-direction:column}
+  .brand{display:flex;align-items:center;gap:10px;padding:0 28px 26px;font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .brand .lg{width:36px;height:36px;border-radius:10px;background:var(--primary);color:#fff;display:grid;place-items:center}
+  .brand .lg .ic{width:22px;height:22px}
+  .brand span b{color:var(--primary)}
+  .navlabel{font-size:12px;font-weight:700;color:var(--muted);padding:14px 28px 8px;letter-spacing:.06em;text-transform:uppercase}
+  nav a,nav button{display:flex;align-items:center;gap:14px;margin:2px 16px;padding:12px 16px;border-radius:8px;border:0;background:none;
+        color:var(--ink);font:inherit;font-weight:600;font-size:15px;text-decoration:none;cursor:pointer;width:calc(100% - 32px);text-align:left;position:relative}
+  nav a:hover,nav button:hover{background:var(--primary-soft)}
+  nav button.on{background:var(--primary);color:#fff}
+  nav button.on::before{content:"";position:absolute;left:-16px;top:4px;bottom:4px;width:5px;border-radius:0 4px 4px 0;background:var(--primary)}
+  nav small{display:block;font-weight:400;font-size:12px;opacity:.75}
+  .side-foot{margin-top:auto;padding:16px 28px 0;font-size:12px;color:var(--muted);line-height:1.6;display:flex;gap:8px}
+  .side-foot .ic{width:18px;height:18px;color:var(--t-green)}
+
+  header{background:var(--card);border-bottom:1px solid var(--line);height:70px;display:flex;align-items:center;gap:16px;padding:0 30px;position:sticky;top:0;z-index:5}
+  .search{flex:1;max-width:390px;display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--line);border-radius:20px;padding:9px 16px;color:var(--muted);font-size:14px}
+  .search .ic{width:18px;height:18px}
+  .hd-right{margin-left:auto;display:flex;align-items:center;gap:18px}
+  .chip{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+  .chip .ic{width:18px;height:18px;color:var(--primary)}
+  .avatar{display:flex;align-items:center;gap:10px}
+  .avatar .av{width:40px;height:40px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center}
+  .avatar b{display:block;font-size:14px}
+  .avatar small{color:var(--muted);font-size:12px}
+
+  .content{padding:28px 30px 40px}
+  .page-title{font-size:30px;font-weight:800;margin:0 0 22px;letter-spacing:-.02em}
+
+  /* ---------- stat cards ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px;margin-bottom:24px}
+  .stat{background:var(--card);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow)}
+  .stat-top{display:flex;justify-content:space-between;gap:10px}
+  .stat-t{font-size:15px;color:var(--muted);font-weight:600}
+  .stat-v{font-size:27px;font-weight:800;margin-top:12px;letter-spacing:.01em;line-height:1.15;word-break:break-word}
+  .stat-v.sm{font-size:20px}
+  .sic{width:56px;height:56px;border-radius:20px;display:grid;place-items:center;flex:none}
+  .sic .ic{width:28px;height:28px}
+  .stat-f{margin-top:16px;font-size:13.5px;color:var(--muted);display:flex;align-items:center;gap:6px;min-height:20px}
+  .stat-f .ic{width:18px;height:18px}
+  .up{color:var(--t-green)} .dn{color:var(--err)}
+  .tint-purple{background:var(--t-purple-bg);color:var(--t-purple)}
+  .tint-yellow{background:var(--t-yellow-bg);color:var(--t-yellow)}
+  .tint-green{background:var(--t-green-bg);color:var(--t-green)}
+  .tint-orange{background:var(--t-orange-bg);color:var(--t-orange)}
+
+  /* ---------- panels ---------- */
+  .grid2{display:grid;grid-template-columns:minmax(320px,400px) 1fr;gap:24px;align-items:start}
+  .panel{background:var(--card);border-radius:14px;padding:24px;box-shadow:var(--shadow)}
+  .panel h2{font-size:21px;font-weight:800;margin:0 0 18px;display:flex;align-items:center;gap:10px}
+  .panel h2 .ic{color:var(--primary)}
+  .panel h2 .tag{margin-left:auto;font-size:12px;font-weight:700;padding:5px 12px;border-radius:6px;background:var(--primary-soft);color:var(--primary)}
+  label{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--muted);margin:16px 0 8px}
+  label .ic{width:17px;height:17px;color:var(--primary)}
+  label small{font-weight:400}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
-  .field:focus-within{border-color:var(--accent)}
-  .field input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:18px;padding:11px 12px;outline:none;min-width:0;color-scheme:light dark}
-  .field span{padding:0 12px;color:var(--muted);font-size:14px}
-  input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
+  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:var(--field);overflow:hidden}
+  .field:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-soft)}
+  .field input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:600;padding:11px 14px;outline:none;min-width:0;color-scheme:light dark}
+  .field span{padding:0 14px;color:var(--muted);font-size:13px}
+  input[type=range]{width:100%;accent-color:var(--primary);margin-top:10px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg button{display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--field);color:var(--ink);
+              font:inherit;font-weight:600;padding:11px;border-radius:8px;cursor:pointer}
+  .seg button.on{background:var(--primary);border-color:var(--primary);color:#fff}
+  .seg.sm button{padding:7px;font-size:13px}
   .agehint{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
   .agehint b{color:var(--ink)}
-  .go{width:100%;margin-top:22px;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:600;
-      color:#fff;background:var(--accent);cursor:pointer;box-shadow:0 4px 14px rgba(242,107,29,.30);transition:transform .08s,filter .15s}
-  .go:hover{filter:brightness(1.06)}
-  .go:active{transform:scale(.98)}
+  .go{width:100%;margin-top:24px;border:0;border-radius:8px;padding:14px;font:inherit;font-size:16px;font-weight:700;color:#fff;background:var(--primary);
+      cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:filter .15s,transform .08s}
+  .go:hover{filter:brightness(1.07)} .go:active{transform:scale(.99)}
   .go.stale{animation:pulse 1.4s ease-in-out infinite}
-  @keyframes pulse{50%{box-shadow:0 4px 22px rgba(242,107,29,.55)}}
+  @keyframes pulse{50%{box-shadow:0 0 0 6px var(--primary-soft)}}
   .err{color:var(--err);font-size:14px;margin-top:12px;line-height:1.6}
   .err:empty{display:none}
-  #out{animation:fade .3s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .refname{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
-  .result{margin-top:6px;text-align:center}
-  .num{font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em}
-  .unit{font-size:14px;color:var(--muted);margin-top:4px}
-  .cat{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:99px;font-weight:600;font-size:15px;color:#fff}
-  .cat small{font-weight:400;opacity:.85;margin-left:6px}
-  .zline{margin-top:10px;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+  .empty{text-align:center;color:var(--muted);padding:48px 10px}
+  .empty .bubble{width:84px;height:84px;border-radius:50%;background:var(--primary-soft);color:var(--primary);display:grid;place-items:center;margin:0 auto 14px}
+  .empty .bubble .ic{width:40px;height:40px}
+  .refname{font-size:13px;color:var(--muted);margin-bottom:6px}
+  .gauge-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .big{font-size:48px;font-weight:800;line-height:1;letter-spacing:-.02em}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:6px;font-size:13px;font-weight:700}
+  .zline{color:var(--muted);font-size:14px;margin-top:8px}
   .zline b{color:var(--ink)}
   .barwrap{position:relative;margin-top:24px}
-  .bar{display:flex;height:12px;border-radius:99px;overflow:hidden}
+  .bar{display:flex;height:12px;border-radius:99px;overflow:hidden;gap:2px}
   .bar div{height:100%}
-  .marker{position:absolute;top:-6px;width:4px;height:24px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .3s ease}
-  .ticks{position:relative;height:18px;font-size:11px;color:var(--muted);margin-top:4px}
+  .marker{position:absolute;top:-7px;width:26px;height:26px;border-radius:50%;background:var(--card);border:5px solid var(--ink);transform:translateX(-50%);transition:left .3s ease}
+  .ticks{position:relative;height:18px;font-size:11.5px;color:var(--muted);margin-top:8px}
   .ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
-  .info{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
-  .info b{color:var(--ink)}
-  .box{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);font-size:14px;line-height:1.7}
-  .box.warn{background:var(--warn-bg)}
-  .box h3{margin:0 0 4px;font-size:15px}
-  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
-  td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+  table{width:100%;border-collapse:collapse;margin-top:18px;font-size:14px}
+  th{background:var(--field);text-align:left;font-size:12.5px;font-weight:700;color:var(--muted);padding:11px 14px}
+  th:first-child{border-radius:8px 0 0 8px} th:last-child{border-radius:0 8px 8px 0;text-align:right}
+  td{padding:12px 14px;border-bottom:1px solid var(--line)}
   td:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
-  tr.active td{font-weight:600;color:var(--ink)}
-  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
-  .adultseg{margin-top:16px}
-  .note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:18px}
-  .note ul{margin:4px 0 0;padding-left:18px}
-  .refs{font-size:12px;color:var(--muted);line-height:1.7;margin-top:20px}
-  .refs a{color:var(--accent)}
-  /* icons */
-  .ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
-  .brand{display:flex;align-items:center;gap:14px;margin-bottom:6px}
-  .logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ff9a4d,#f26b1d);display:grid;place-items:center;
-        box-shadow:0 6px 16px rgba(242,107,29,.35);color:#fff}
-  .logo .ic{width:30px;height:30px;stroke-width:2.2}
-  .brand h1{margin:0}
-  label{display:flex;align-items:center;gap:6px}
-  label .ic{color:var(--accent);width:17px;height:17px}
-  .sec{display:flex;align-items:center;gap:6px}
-  .sec .ic{width:16px;height:16px}
-  .mode{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-  .mode button{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:14px 10px 12px;
-               font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s}
-  .mode button:hover{border-color:var(--accent)}
-  .mode .mic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);margin-bottom:4px;transition:all .15s}
-  .mode .mic .ic{width:30px;height:30px}
-  .mode b{font-size:17px}
-  .mode small{font-size:12px;color:var(--muted)}
-  .mode button.on{border-color:var(--accent);background:var(--accent-soft)}
-  .mode button.on .mic{background:var(--accent);color:#fff;transform:scale(1.05)}
-  .seg button{display:flex;align-items:center;justify-content:center;gap:6px}
-  .box h3{display:flex;align-items:center;gap:6px}
-  .note b, .refs b{display:inline-flex;align-items:center;gap:5px}
-  .gobtn-ic{width:20px;height:20px;vertical-align:-4px;margin-right:6px}
+  tr.active td{font-weight:700;color:var(--ink);background:var(--primary-soft)}
+  .pill{display:inline-block;text-align:center;padding:4px 10px;border-radius:5px;font-size:12.5px;font-weight:700}
+  .box{margin-top:16px;padding:14px 16px;border-radius:10px;background:var(--primary-soft);font-size:14px;line-height:1.7}
+  .box.warn{background:var(--warn-bg)}
+  .box h3{margin:0 0 4px;font-size:15px;display:flex;align-items:center;gap:8px}
+  .box h3 .ic{width:18px;height:18px}
+  .info2{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.75}
+  .info2 b{color:var(--ink)}
+  .adultseg{max-width:300px;margin-bottom:16px}
+
+  .grid-foot{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}
+  .foot-txt{font-size:14px;color:var(--muted);line-height:1.8}
+  .foot-txt ul{margin:6px 0;padding-left:20px}
+  .foot-txt a{color:var(--primary)}
+  #out{animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1180px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} .grid2{grid-template-columns:1fr} }
+  @media (max-width:860px){
+    .app{grid-template-columns:1fr}
+    aside{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px 0 10px}
+    .brand{padding:0 20px 12px}
+    .navlabel,.side-foot,nav .extra{display:none}
+    nav{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px}
+    nav button{margin:0;width:100%}
+    nav button.on::before{display:none}
+    header{position:static;padding:0 20px;height:60px}
+    .search,.avatar .who{display:none}
+    .content{padding:20px 16px 32px}
+    .page-title{font-size:24px}
+    .grid-foot{grid-template-columns:1fr}
+  }
+  @media (max-width:480px){ .stats{gap:12px} .stat{padding:14px} .stat-v{font-size:22px} .sic{width:44px;height:44px;border-radius:14px} .sic .ic{width:22px;height:22px} }
 </style>
 </head>
 <body>
@@ -119,7 +172,6 @@
   <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9.5a5 5 0 0 1 8 0"/><path d="M12 12.5l1.8-3"/></symbol>
   <symbol id="i-tape" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="4.5"/><path d="M6 10.8v2.4M9 11.5v1.6M12 7.5v2M15 11.5v1.6M18 10.8v2.4"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
-  <symbol id="i-body" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M8 21l4-8 4 8"/><circle cx="12" cy="3" r="0.6"/></symbol>
   <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8 6.5h8M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></symbol>
   <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
   <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17h.01"/></symbol>
@@ -127,82 +179,104 @@
   <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 2h13v-4"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
   <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4 3-6.5 7.5-6.5 0 4.2-3 6.5-7.5 6.5z"/><path d="M12 14.5C12 11 9.5 9 5 9c0 3.7 2.6 5.5 7 5.5z"/></symbol>
+  <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0"/><path d="M12 16l4-5"/><circle cx="12" cy="16" r="1.2"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V4M4 20h16"/><path d="M7.5 15l3.5-4 3 2.5 5-6"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></symbol>
+  <symbol id="i-trend-up" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></symbol>
+  <symbol id="i-trend-dn" viewBox="0 0 24 24"><path d="M3 7l6 6 4-4 8 8"/><path d="M15 17h6v-6"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></symbol>
 </svg>
-<main>
-  <div class="brand">
-    <div class="logo"><svg class="ic"><use href="#i-heart"/></svg></div>
-    <div>
-      <h1>คำนวณ BMI</h1>
-      <p class="sub" style="margin:0">ดัชนีมวลกาย สำหรับเด็ก (2 ปีขึ้นไป) และผู้ใหญ่ ตามเกณฑ์องค์การอนามัยโลก</p>
-    </div>
-  </div>
-  <div style="height:20px"></div>
 
-  <div class="card">
-    <div class="mode" id="modeSeg" role="tablist" aria-label="เลือกกลุ่มอายุ">
-      <button type="button" data-mode="kid">
-        <span class="mic"><svg class="ic"><use href="#i-child"/></svg></span>
-        <b>เด็กและวัยรุ่น</b><small>อายุ 2 – 19 ปี</small>
-      </button>
-      <button type="button" data-mode="adult" class="on">
-        <span class="mic"><svg class="ic"><use href="#i-adult"/></svg></span>
-        <b>ผู้ใหญ่</b><small>อายุ 18 ปีขึ้นไป</small>
-      </button>
-    </div>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="lg"><svg class="ic"><use href="#i-heart"/></svg></div><span><b>BMI</b>Check</span></div>
+    <div class="navlabel">กลุ่มอายุ</div>
+    <nav id="modeNav">
+      <button type="button" data-mode="adult" class="on"><svg class="ic"><use href="#i-adult"/></svg><span>ผู้ใหญ่<small>อายุ 18 ปีขึ้นไป</small></span></button>
+      <button type="button" data-mode="kid"><svg class="ic"><use href="#i-child"/></svg><span>เด็กและวัยรุ่น<small>อายุ 2 – 19 ปี</small></span></button>
+      <div class="navlabel extra">ข้อมูล</div>
+      <a class="extra" href="#notes"><svg class="ic"><use href="#i-info"/></svg>ข้อควรทราบ</a>
+      <a class="extra" href="#refs"><svg class="ic"><use href="#i-book"/></svg>แหล่งอ้างอิง</a>
+    </nav>
+    <div class="side-foot"><svg class="ic"><use href="#i-shield"/></svg><span>ข้อมูลคำนวณบนเครื่องของคุณ<br>ไม่มีการส่งหรือจัดเก็บ</span></div>
+  </aside>
 
-    <div class="sec"><svg class="ic"><use href="#i-user"/></svg>ข้อมูลผู้ถูกวัด</div>
-    <label>เพศ</label>
-    <div class="seg" id="sexSeg">
-      <button type="button" data-sex="b"><svg class="ic"><use href="#i-male"/></svg>ชาย</button>
-      <button type="button" data-sex="g"><svg class="ic"><use href="#i-female"/></svg>หญิง</button>
-    </div>
-    <div id="kidFields" hidden>
-      <div class="row">
-        <div><label for="dob"><svg class="ic"><use href="#i-cal"/></svg>วันเกิด</label><div class="field"><input id="dob" type="date"></div></div>
-        <div><label for="dom"><svg class="ic"><use href="#i-check"/></svg>วันที่วัด</label><div class="field"><input id="dom" type="date"></div></div>
+  <div>
+    <header>
+      <div class="search"><svg class="ic"><use href="#i-search"/></svg>ดัชนีมวลกาย · เกณฑ์องค์การอนามัยโลก</div>
+      <div class="hd-right">
+        <div class="chip"><svg class="ic"><use href="#i-cal"/></svg><span id="today"></span></div>
+        <div class="avatar"><div class="av"><svg class="ic"><use href="#i-user"/></svg></div><div class="who"><b id="whoName">ผู้ใหญ่</b><small id="whoSub">เกณฑ์เอเชีย / WHO</small></div></div>
       </div>
-      <div class="agehint" id="agehint"></div>
-    </div>
+    </header>
 
-    <hr>
-    <div class="sec"><svg class="ic"><use href="#i-body"/></svg>สัดส่วนร่างกาย</div>
-    <label for="h"><svg class="ic"><use href="#i-ruler"/></svg>ส่วนสูง</label>
-    <div class="field"><input id="h" type="number" inputmode="decimal" step="0.1" value="165"><span>ซม.</span></div>
-    <input id="hr" type="range" min="60" max="210" step="0.5" value="165" aria-label="ส่วนสูง">
+    <div class="content">
+      <h1 class="page-title">คำนวณ BMI</h1>
 
-    <label for="w"><svg class="ic"><use href="#i-scale"/></svg>น้ำหนัก</label>
-    <div class="field"><input id="w" type="number" inputmode="decimal" step="0.1" value="60"><span>กก.</span></div>
-    <input id="wr" type="range" min="5" max="150" step="0.5" value="60" aria-label="น้ำหนัก">
+      <div class="stats" id="stats"></div>
 
-    <div id="waistWrap">
-      <label for="waist"><svg class="ic"><use href="#i-tape"/></svg>รอบเอว <small>(ไม่บังคับ · วัดระดับสะดือ)</small></label>
-      <div class="field"><input id="waist" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 78"><span>ซม.</span></div>
-    </div>
+      <div class="grid2">
+        <section class="panel">
+          <h2><svg class="ic"><use href="#i-user"/></svg>ข้อมูลผู้ถูกวัด</h2>
+          <label>เพศ</label>
+          <div class="seg" id="sexSeg">
+            <button type="button" data-sex="b"><svg class="ic"><use href="#i-male"/></svg>ชาย</button>
+            <button type="button" data-sex="g"><svg class="ic"><use href="#i-female"/></svg>หญิง</button>
+          </div>
+          <div id="kidFields" hidden>
+            <div class="row">
+              <div><label for="dob"><svg class="ic"><use href="#i-cal"/></svg>วันเกิด</label><div class="field"><input id="dob" type="date"></div></div>
+              <div><label for="dom"><svg class="ic"><use href="#i-check"/></svg>วันที่วัด</label><div class="field"><input id="dom" type="date"></div></div>
+            </div>
+            <div class="agehint" id="agehint"></div>
+          </div>
 
-    <button id="go" class="go" type="button"><svg class="ic gobtn-ic"><use href="#i-calc"/></svg>คำนวณ BMI</button>
-    <div class="err" id="err" role="alert"></div>
+          <label for="h"><svg class="ic"><use href="#i-ruler"/></svg>ส่วนสูง</label>
+          <div class="field"><input id="h" type="number" inputmode="decimal" step="0.1" value="165"><span>ซม.</span></div>
+          <input id="hr" type="range" min="60" max="210" step="0.5" value="165" aria-label="ส่วนสูง">
 
-    <div id="out" hidden aria-live="polite"></div>
+          <label for="w"><svg class="ic"><use href="#i-scale"/></svg>น้ำหนัก</label>
+          <div class="field"><input id="w" type="number" inputmode="decimal" step="0.1" value="60"><span>กก.</span></div>
+          <input id="wr" type="range" min="5" max="150" step="0.5" value="60" aria-label="น้ำหนัก">
 
-    <div class="note">
-      <b><svg class="ic"><use href="#i-info"/></svg>ข้อควรทราบ</b> ผลนี้เป็นการประเมินเบื้องต้น ไม่ใช่การวินิจฉัย BMI ไม่แยกกล้ามเนื้อกับไขมัน จึงไม่เหมาะกับ:
-      <ul>
-        <li>หญิงตั้งครรภ์หรือให้นมบุตร</li>
-        <li>นักกีฬาหรือผู้ที่มีกล้ามเนื้อมาก</li>
-        <li>ผู้สูงอายุ และผู้พิการบางกลุ่ม</li>
-      </ul>
-      หากกังวลเรื่องน้ำหนักหรือการเจริญเติบโต ควรปรึกษาแพทย์หรือนักโภชนาการ<br>
-      <b><svg class="ic"><use href="#i-shield"/></svg></b> ข้อมูลทั้งหมดคำนวณบนเครื่องของคุณ ไม่มีการส่งหรือจัดเก็บไว้ที่ใด
-    </div>
+          <div id="waistWrap">
+            <label for="waist"><svg class="ic"><use href="#i-tape"/></svg>รอบเอว <small>(ไม่บังคับ · วัดระดับสะดือ)</small></label>
+            <div class="field"><input id="waist" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 78"><span>ซม.</span></div>
+          </div>
 
-    <div class="refs">
-      <b><svg class="ic"><use href="#i-book"/></svg>แหล่งอ้างอิง</b><br>
-      • WHO Child Growth Standards (2006) — BMI-for-age อายุ 2–5 ปี<br>
-      • WHO Growth Reference 5–19 years (2007) — <a href="https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/bmi-for-age">BMI-for-age</a><br>
-      • WHO Expert Consultation (2004) — เกณฑ์ BMI สำหรับประชากรเอเชีย (Lancet 363:157–163)
+          <button id="go" class="go" type="button"><svg class="ic"><use href="#i-calc"/></svg>คำนวณ BMI</button>
+          <div class="err" id="err" role="alert"></div>
+        </section>
+
+        <section class="panel">
+          <h2><svg class="ic"><use href="#i-gauge"/></svg>ผลการประเมิน<span class="tag" id="refTag">เกณฑ์ผู้ใหญ่</span></h2>
+          <div id="emptyState" class="empty"><div class="bubble"><svg class="ic"><use href="#i-chart"/></svg></div>
+            กรอกข้อมูลด้านซ้าย แล้วกด <b>คำนวณ BMI</b><br>ผลการประเมินจะแสดงที่นี่</div>
+          <div id="out" hidden aria-live="polite"></div>
+        </section>
+      </div>
+
+      <div class="grid-foot">
+        <section class="panel" id="notes">
+          <h2><svg class="ic"><use href="#i-info"/></svg>ข้อควรทราบ</h2>
+          <div class="foot-txt">ผลนี้เป็นการประเมินเบื้องต้น ไม่ใช่การวินิจฉัย BMI ไม่แยกกล้ามเนื้อกับไขมัน จึงไม่เหมาะกับ
+            <ul><li>หญิงตั้งครรภ์หรือให้นมบุตร</li><li>นักกีฬาหรือผู้ที่มีกล้ามเนื้อมาก</li><li>ผู้สูงอายุ และผู้พิการบางกลุ่ม</li></ul>
+            หากกังวลเรื่องน้ำหนักหรือการเจริญเติบโต ควรปรึกษาแพทย์หรือนักโภชนาการ</div>
+        </section>
+        <section class="panel" id="refs">
+          <h2><svg class="ic"><use href="#i-book"/></svg>แหล่งอ้างอิง</h2>
+          <div class="foot-txt">
+            • WHO Child Growth Standards (2006) — BMI-for-age อายุ 2–5 ปี<br>
+            • WHO Growth Reference 5–19 years (2007) — <a href="https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/bmi-for-age">BMI-for-age</a><br>
+            • WHO Expert Consultation (2004) — เกณฑ์ BMI สำหรับประชากรเอเชีย (Lancet 363:157–163)
+          </div>
+        </section>
+      </div>
     </div>
   </div>
-</main>
+</div>
 
 <script>
 /* WHO LMS, BMI-for-age, index = age in completed months − 24 (24…228).
@@ -246,12 +320,14 @@ const KID = {
     {n:"เกินเกณฑ์มาก", en:"Obesity", hi:Infinity, c:"--c5", tip:KID_TIPS.o2}]}
 };
 
+
+
 const $ = id => document.getElementById(id);
 const cv = v => `var(${v})`;
 const f1 = x => x.toFixed(1);
 const sgn = z => (z>=0?"+":"−")+Math.abs(z).toFixed(2);
-let sex = null, adultStd = "asia", shown = false, mode = "adult";
 const ICON = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+let sex = null, adultStd = "asia", shown = false, mode = "adult";
 
 /* ---------- maths ---------- */
 function ageMonths(dob, dom){
@@ -271,14 +347,15 @@ function erf(x){ const t=1/(1+0.3275911*Math.abs(x));
   const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
   return x>=0?y:-y; }
 const pctl = z => 50*(1+erf(z/Math.SQRT2));
-function classifyZ(z, bands){ return bands.findIndex(b => b.inc ? z<=b.hi : z<b.hi); }
-function classifyBMI(v, bands){ return bands.findIndex(b => v<b.hi); }
+const classifyZ = (z, bands) => bands.findIndex(b => b.inc ? z<=b.hi : z<b.hi);
+const classifyBMI = (v, bands) => bands.findIndex(b => v<b.hi);
 const ageText = m => `${Math.floor(m/12)} ปี ${m%12} เดือน`;
 
 /* ---------- inputs ---------- */
 function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
 function parseDate(s){ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
 $("dom").value = todayStr(); $("dob").max = todayStr();
+try { $("today").textContent = new Date().toLocaleDateString("th-TH",{day:"numeric",month:"short",year:"numeric"}); } catch(e){}
 
 document.querySelectorAll("#sexSeg button").forEach(b => b.onclick = () => {
   sex = b.dataset.sex;
@@ -293,18 +370,22 @@ link("h","hr"); link("w","wr");
 ["dob","dom","waist"].forEach(id => $(id).addEventListener("input", changed));
 ["h","w","waist"].forEach(id => $(id).addEventListener("keydown", e => { if(e.key==="Enter") run(); }));
 $("go").onclick = run;
+
 const DEF = {kid:{h:"120",w:"22"}, adult:{h:"165",w:"60"}};
 function setMode(k){
   if (k===mode) return;
   mode = k;
-  document.querySelectorAll("#modeSeg button").forEach(x => x.classList.toggle("on", x.dataset.mode===k));
+  document.querySelectorAll("#modeNav button").forEach(x => x.classList.toggle("on", x.dataset.mode===k));
   $("kidFields").hidden = k!=="kid";
   $("waistWrap").hidden = k!=="adult";
+  $("whoName").textContent = k==="kid" ? "เด็กและวัยรุ่น" : "ผู้ใหญ่";
+  $("whoSub").textContent = k==="kid" ? "เกณฑ์ WHO 2006 / 2007" : "เกณฑ์เอเชีย / WHO";
+  $("refTag").textContent = k==="kid" ? "เกณฑ์เด็ก WHO" : "เกณฑ์ผู้ใหญ่";
   ["h","w"].forEach(id => { $(id).value = DEF[k][id]; $(id+"r").value = DEF[k][id]; });
-  $("out").hidden = true; $("err").innerHTML = ""; shown = false; $("go").classList.remove("stale");
+  resetOut();
   changed();
 }
-document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+document.querySelectorAll("#modeNav button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
 
 function currentAge(){
   const dob=parseDate($("dob").value), dom=parseDate($("dom").value);
@@ -315,7 +396,7 @@ function changed(){
   const m = currentAge();
   $("agehint").innerHTML = m==null ? "" :
     `อายุ <b>${ageText(m)}</b> · ` + (m<24 ? "ยังไม่รองรับ (ต่ำกว่า 2 ปี)" : m<61 ? "ใช้เกณฑ์เด็กเล็ก WHO 2006" :
-      m<=228 ? "ใช้เกณฑ์เด็กและวัยรุ่น WHO 2007" : "เกิน 19 ปี — กรุณาเลือกโหมดผู้ใหญ่");
+      m<=228 ? "ใช้เกณฑ์เด็กและวัยรุ่น WHO 2007" : "เกิน 19 ปี — กรุณาเลือกเมนูผู้ใหญ่");
   if (shown) $("go").classList.add("stale");
 }
 
@@ -332,128 +413,168 @@ function validate(){
   const h=parseFloat($("h").value), w=parseFloat($("w").value);
   if(!(h>=45 && h<=250)) e.push("ส่วนสูงควรอยู่ระหว่าง 45–250 ซม.");
   if(!(w>=2 && w<=300)) e.push("น้ำหนักควรอยู่ระหว่าง 2–300 กก.");
-  const ws=mode==="adult" ? $("waist").value.trim() : "";
+  const ws = mode==="adult" ? $("waist").value.trim() : "";
   if(ws && !(parseFloat(ws)>=30 && parseFloat(ws)<=250)) e.push("รอบเอวควรอยู่ระหว่าง 30–250 ซม.");
   return e;
 }
 
-/* ---------- rendering helpers ---------- */
+/* ---------- stat cards ---------- */
+function statCard(t, v, icon, tint, foot, small){
+  return `<div class="stat"><div class="stat-top"><div><div class="stat-t">${t}</div><div class="stat-v${small?" sm":""}">${v}</div></div>
+    <div class="sic tint-${tint}">${ICON(icon)}</div></div><div class="stat-f">${foot||"&nbsp;"}</div></div>`;
+}
+function renderStats(list){ $("stats").innerHTML = list.map(a => statCard(...a)).join(""); }
+function emptyStats(){
+  const kid = mode==="kid";
+  renderStats([
+    ["ค่า BMI","–","calc","purple","กก./ม²"],
+    ["ระดับ","–","heart","yellow","ตามเกณฑ์ที่เลือก"],
+    kid ? ["เปอร์เซ็นไทล์","–","chart","green","เทียบเพศและอายุเดียวกัน"] : ["น้ำหนักที่เหมาะสม","–","target","green","ตามส่วนสูง"],
+    kid ? ["ช่วงน้ำหนักสมส่วน","–","target","orange","ที่ส่วนสูงปัจจุบัน"] : ["รอบเอว","–","tape","orange","ไม่บังคับ"]
+  ]);
+}
+function resetOut(){
+  shown=false; $("out").hidden=true; $("emptyState").hidden=false; $("err").innerHTML=""; $("go").classList.remove("stale"); emptyStats();
+}
+
+/* ---------- detail helpers ---------- */
 function scaleHTML(bands, lo, hi, val, tickFmt){
   const pos = v => ((Math.min(Math.max(v,lo),hi)-lo)/(hi-lo))*100;
   let prev=lo, bar="", ticks="";
   bands.forEach(b => { const end=Math.min(b.hi,hi);
-    bar += `<div style="width:${pos(end)-pos(prev)}%;background:${cv(b.c)}"></div>`;
+    bar += `<div style="flex:${pos(end)-pos(prev)};background:${cv(b.c)}"></div>`;
     if(b.hi!==Infinity && b.hi<hi) ticks += `<span style="left:${pos(b.hi)}%">${tickFmt(b.hi)}</span>`;
     prev=end; });
   return `<div class="barwrap"><div class="bar">${bar}</div><div class="marker" style="left:${pos(val)}%"></div></div><div class="ticks">${ticks}</div>`;
 }
-function pill(b, i, active){ return `<span class="cat" style="background:${cv(b.c)}">${b.n}${b.en?`<small>${b.en}</small>`:""}</span>`; }
-
-function kidTable(bands, lms){
+const badge = b => `<span class="badge" style="background:color-mix(in srgb, ${cv(b.c)} 16%, transparent);color:${cv(b.c)}">${b.n}${b.en?` · ${b.en}`:""}</span>`;
+const pill = b => `<span class="pill" style="background:color-mix(in srgb, ${cv(b.c)} 16%, transparent);color:${cv(b.c)}">${b.n}</span>`;
+function kidTable(bands, lms, active){
   let prev=null;
-  return `<table>${bands.map((b,j)=>{
-    let r;
-    if(j===0) r=`z < ${b.hi} (BMI < ${f1(sdVal(lms,b.hi))})`;
-    else if(b.hi===Infinity) r=`z > ${prev} (BMI > ${f1(sdVal(lms,prev))})`;
-    else r=`${prev>0?"+":""}${prev} ถึง ${b.hi>0?"+":""}${b.hi} (${f1(sdVal(lms,prev))}–${f1(sdVal(lms,b.hi))})`;
+  const rows = bands.map((b,j)=>{
+    let z, r;
+    if(j===0){ z=`z < ${b.hi}`; r=`< ${f1(sdVal(lms,b.hi))}`; }
+    else if(b.hi===Infinity){ z=`z > +${prev}`; r=`> ${f1(sdVal(lms,prev))}`; }
+    else { z=`${prev>0?"+":""}${prev} ถึง ${b.hi>0?"+":""}${b.hi}`; r=`${f1(sdVal(lms,prev))} – ${f1(sdVal(lms,b.hi))}`; }
     prev=b.hi;
-    return `<tr data-i="${j}"><td><span class="dot" style="background:${cv(b.c)}"></span>${b.n}</td><td>${r}</td></tr>`;
-  }).join("")}</table>`;
+    return `<tr class="${j===active?"active":""}"><td>${pill(b)}</td><td>${z}</td><td>${r}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th>ระดับ</th><th>z-score</th><th>BMI (อายุนี้)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
-function adultTable(bands){
+function adultTable(bands, active){
   let p=0;
-  return `<table>${bands.map((b,j)=>{
+  const rows = bands.map((b,j)=>{
     const r = b.hi===Infinity ? `≥ ${p}` : (j===0 ? `< ${b.hi}` : `${p} – ${(b.hi-0.1).toFixed(1)}`);
     p=b.hi;
-    return `<tr data-i="${j}"><td><span class="dot" style="background:${cv(b.c)}"></span>${b.n}</td><td>${r}</td></tr>`;
-  }).join("")}</table>`;
+    return `<tr class="${j===active?"active":""}"><td>${pill(b)}</td><td>${r}</td></tr>`;
+  }).join("");
+  return `<table><thead><tr><th>สถานะ</th><th>BMI (กก./ม²)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
-const markRow = (html, i) => html.replace(`<tr data-i="${i}">`, `<tr data-i="${i}" class="active">`);
+const warnBox = (t, body) => `<div class="box warn"><h3>${ICON("alert")}${t}</h3>${body}</div>`;
 
 /* ---------- main ---------- */
 function run(){
   const errs = validate();
   $("err").innerHTML = errs.join("<br>");
-  if (errs.length){ $("out").hidden = true; return; }
+  if (errs.length){ resetOut(); $("err").innerHTML = errs.join("<br>"); return; }
   shown = true; $("go").classList.remove("stale");
   const m = currentAge();
   const h = parseFloat($("h").value), w = parseFloat($("w").value), hm = h/100;
   const bmi = w/(hm*hm);
-  const who = (m!=null && m>=156 ? "วัยรุ่น" : "เด็ก") + (sex==="b" ? "ชาย" : "หญิง");
-  let html = "";
+  let html;
+  emptyStats();
 
   if (mode === "adult"){
     html = adultResult(bmi, hm, w);
   } else if (m < 24){
-    html = `<div class="box warn"><h3>${ICON("alert")}ยังไม่รองรับอายุต่ำกว่า 2 ปี</h3>เด็กอายุต่ำกว่า 2 ปีประเมินการเจริญเติบโตด้วยน้ำหนักและความยาวตามอายุ แนะนำให้ใช้กราฟในสมุดบันทึกสุขภาพแม่และเด็ก (สมุดสีชมพู) หรือปรึกษาเจ้าหน้าที่สาธารณสุข</div>`;
+    html = warnBox("ยังไม่รองรับอายุต่ำกว่า 2 ปี", "เด็กอายุต่ำกว่า 2 ปีประเมินการเจริญเติบโตด้วยน้ำหนักและความยาวตามอายุ แนะนำให้ใช้กราฟในสมุดบันทึกสุขภาพแม่และเด็ก (สมุดสีชมพู) หรือปรึกษาเจ้าหน้าที่สาธารณสุข");
   } else if (m > 228){
-    html = `<div class="box warn"><h3>${ICON("alert")}อายุเกิน 19 ปี</h3>เกณฑ์เด็กและวัยรุ่นของ WHO ใช้ได้ถึงอายุ 19 ปี กรุณาเลือกโหมด <b>ผู้ใหญ่</b> ด้านบน</div>`;
+    html = warnBox("อายุเกิน 19 ปี", "เกณฑ์เด็กและวัยรุ่นของ WHO ใช้ได้ถึงอายุ 19 ปี กรุณาเลือกเมนู <b>ผู้ใหญ่</b>");
   } else {
-    html = kidResult(m, bmi, hm, who, true);
-    if (m >= 216) html = `<div class="box">${ICON("info")} อายุ 18–19 ปีอยู่ในช่วงต่อระหว่างวัยรุ่นกับผู้ใหญ่ สามารถเทียบกับเกณฑ์ผู้ใหญ่ได้ในโหมด <b>ผู้ใหญ่</b></div>` + html;
+    const who = (m>=156 ? "วัยรุ่น" : "เด็ก") + (sex==="b" ? "ชาย" : "หญิง");
+    html = kidResult(m, bmi, hm, who);
+    if (m >= 216) html = `<div class="box" style="margin:0 0 14px">${ICON("info")} อายุ 18–19 ปีอยู่ในช่วงต่อระหว่างวัยรุ่นกับผู้ใหญ่ เทียบกับเกณฑ์ผู้ใหญ่ได้ที่เมนู <b>ผู้ใหญ่</b></div>` + html;
   }
   $("out").innerHTML = html;
-  $("out").hidden = false;
+  $("out").hidden = false; $("emptyState").hidden = true;
   const s = $("adultSeg");
   if (s) s.querySelectorAll("button").forEach(b => b.onclick = () => { adultStd = b.dataset.std; run(); });
 }
 
-function kidResult(m, bmi, hm, who, primary){
+function kidResult(m, bmi, hm, who){
   const lms = LMS[sex][m-24];
   const ref = m < 61 ? KID.u5 : KID.o5;
-  const z = zScore(bmi, lms);
-  const p = pctl(z);
-  const head = `<div class="refname">${ref.label} · ${who} อายุ ${ageText(m)}</div>`;
-  const big = primary ? `<div class="num" style="color:${cv(ref.bands[classifyZ(z, ref.bands)].c)}">${f1(bmi)}</div><div class="unit">กก./ม²</div>` : `<div class="unit">BMI ${f1(bmi)} กก./ม²</div>`;
-
+  const z = zScore(bmi, lms), p = pctl(z);
+  let out = `<div class="refname">${ref.label} · ${who} อายุ ${ageText(m)}</div>`;
   if (Math.abs(z) > 5){
-    return head + `<div class="result">${big}</div><div class="box warn"><h3>${ICON("alert")}ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล</h3>z-score = ${sgn(z)} ซึ่งอยู่นอกช่วง ±5 มักเกิดจากการกรอกน้ำหนัก ส่วนสูง หรือวันเกิดผิด หากข้อมูลถูกต้อง ควรปรึกษาแพทย์</div>`;
+    renderStats([["ค่า BMI",f1(bmi),"calc","purple","กก./ม²"],["ระดับ","ตรวจสอบข้อมูล","alert","yellow","ค่าผิดปกติมาก",true],
+      ["เปอร์เซ็นไทล์","–","chart","green",`z-score ${sgn(z)}`],["ช่วงน้ำหนักสมส่วน","–","target","orange","&nbsp;"]]);
+    return out + warnBox("ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล", `z-score = ${sgn(z)} ซึ่งอยู่นอกช่วง ±5 มักเกิดจากการกรอกน้ำหนัก ส่วนสูง หรือวันเกิดผิด หากข้อมูลถูกต้อง ควรปรึกษาแพทย์`);
   }
   const i = classifyZ(z, ref.bands), b = ref.bands[i];
-  const nLo = -2, nHi = m < 61 ? 2 : 1;
-  const bLo = sdVal(lms,nLo), bHi = sdVal(lms,nHi);
+  const bLo = sdVal(lms,-2), bHi = sdVal(lms, m<61 ? 2 : 1);
+  const wLo = bLo*hm*hm, wHi = bHi*hm*hm;
   const pTxt = p < 1 ? "< 1" : p > 99 ? "> 99" : Math.round(p);
-  let out = head + `<div class="result">${big}${pill(b)}
-    <div class="zline">z-score <b>${sgn(z)}</b> · เปอร์เซ็นไทล์ที่ <b>${pTxt}</b></div></div>`;
+  const okBand = b.n === "สมส่วน";
+  renderStats([
+    ["ค่า BMI", f1(bmi), "calc", "purple", "กก./ม²"],
+    ["ระดับ", `<span style="color:${cv(b.c)}">${b.n}</span>`, "heart", "yellow", `${okBand?ICON("ok"):""}<span class="${okBand?"up":"dn"}">${b.en}</span>`, true],
+    ["เปอร์เซ็นไทล์", `ที่ ${pTxt}`, "chart", "green", `z-score <b style="color:var(--ink)">${sgn(z)}</b>`],
+    ["ช่วงน้ำหนักสมส่วน", `${f1(wLo)}–${f1(wHi)}`, "target", "orange", `กก. ที่ส่วนสูง ${f1(hm*100)} ซม.`, true]
+  ]);
+  out += `<div class="gauge-head"><div class="big" style="color:${cv(b.c)}">${f1(bmi)}</div>${badge(b)}</div>
+    <div class="zline">z-score <b>${sgn(z)}</b> · เปอร์เซ็นไทล์ที่ <b>${pTxt}</b> · ช่วง BMI สมส่วน <b>${f1(bLo)}–${f1(bHi)}</b></div>`;
   out += scaleHTML(ref.bands, -4, 4, z, v => (v>0?"+":"")+v+" SD");
-  out += `<div class="info">ช่วง BMI สมส่วนสำหรับ${who}วัยนี้: <b>${f1(bLo)} – ${f1(bHi)}</b><br>
-    เทียบเป็นน้ำหนักที่ส่วนสูงปัจจุบัน: <b>${f1(bLo*hm*hm)} – ${f1(bHi*hm*hm)} กก.</b><br>
-    <span style="font-size:13px">เด็กยังเติบโต ช่วงนี้จึงเปลี่ยนไปตามอายุและส่วนสูง ใช้เพื่อติดตาม ไม่ใช่เป้าหมายลดหรือเพิ่มน้ำหนัก</span></div>`;
-  out += `<div class="box"><h3>${ICON("sprout")}คำแนะนำสำหรับผู้ปกครอง</h3>${b.tip}</div>`;
-  out += markRow(kidTable(ref.bands, lms), i);
+  out += `<div class="box"><h3>${ICON("sprout")}คำแนะนำสำหรับผู้ปกครอง</h3>${b.tip}<br><span style="font-size:13px;color:var(--muted)">เด็กยังเติบโต ช่วงน้ำหนักจึงเปลี่ยนตามอายุและส่วนสูง ใช้เพื่อติดตาม ไม่ใช่เป้าหมายลดหรือเพิ่มน้ำหนัก</span></div>`;
+  out += kidTable(ref.bands, lms, i);
   return out;
 }
 
 function adultResult(bmi, hm, w){
   const ref = ADULT[adultStd], bands = ref.bands;
-  let out = `<div class="seg adultseg" id="adultSeg">
+  let out = `<div class="seg sm adultseg" id="adultSeg">
       <button type="button" data-std="asia" class="${adultStd==="asia"?"on":""}">เกณฑ์คนเอเชีย</button>
       <button type="button" data-std="who" class="${adultStd==="who"?"on":""}">เกณฑ์ WHO สากล</button></div>
     <div class="refname">${ref.label} · ผู้ใหญ่ เพศ${sex==="b"?"ชาย":"หญิง"}</div>`;
   if (bmi < 10 || bmi > 80){
-    return out + `<div class="result"><div class="num">${f1(bmi)}</div></div><div class="box warn"><h3>${ICON("alert")}ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล</h3>ค่า BMI นี้อยู่นอกช่วงที่พบได้ทั่วไป อาจกรอกน้ำหนักหรือส่วนสูงผิด</div>`;
+    renderStats([["ค่า BMI",f1(bmi),"calc","purple","กก./ม²"],["ระดับ","ตรวจสอบข้อมูล","alert","yellow","ค่าผิดปกติมาก",true],
+      ["น้ำหนักที่เหมาะสม","–","target","green","&nbsp;"],["รอบเอว","–","tape","orange","&nbsp;"]]);
+    return out + warnBox("ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล", "ค่า BMI นี้อยู่นอกช่วงที่พบได้ทั่วไป อาจกรอกน้ำหนักหรือส่วนสูงผิด");
   }
   const i = classifyBMI(bmi, bands), b = bands[i];
-  out += `<div class="result"><div class="num" style="color:${cv(b.c)}">${f1(bmi)}</div><div class="unit">กก./ม²</div>${pill(b)}</div>`;
-  out += scaleHTML(bands, 14, 40, bmi, v => v);
   const lo = bands[0].hi*hm*hm, hi = bands[1].hi*hm*hm;
-  let diff = bmi < bands[0].hi ? `ต้องเพิ่มอีกประมาณ <b>${f1(lo-w)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`
-           : bmi >= bands[1].hi ? `ต้องลดอีกประมาณ <b>${f1(w-hi+0.1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`
-           : `อยู่ในเกณฑ์ปกติแล้ว 👍`;
-  out += `<div class="info">น้ำหนักที่เหมาะสมสำหรับส่วนสูง ${f1(hm*100)} ซม. คือ <b>${f1(lo)} – ${f1(hi-0.1)} กก.</b><br>${diff}</div><div class="box"><h3>${ICON("bulb")}คำแนะนำ</h3>${b.tip}</div>`;
+  let diffStat, diffTxt;
+  if (bmi < bands[0].hi){ diffStat = `${ICON("trend-up")}<span class="dn">ควรเพิ่ม ${f1(lo-w)} กก.</span>`; diffTxt = `ต้องเพิ่มอีกประมาณ <b>${f1(lo-w)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`; }
+  else if (bmi >= bands[1].hi){ diffStat = `${ICON("trend-dn")}<span class="dn">ควรลด ${f1(w-hi+0.1)} กก.</span>`; diffTxt = `ต้องลดอีกประมาณ <b>${f1(w-hi+0.1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`; }
+  else { diffStat = `${ICON("ok")}<span class="up">อยู่ในเกณฑ์แล้ว</span>`; diffTxt = "อยู่ในเกณฑ์ปกติแล้ว"; }
 
   const ws = parseFloat($("waist").value);
+  let waistStat = ["รอบเอว","–","tape","orange","ไม่ได้กรอก"], waistBox = "";
   if (ws > 0){
-    const cut = sex==="b" ? 90 : 80, whtr = ws/(hm*100);
-    const okW = ws < cut, okR = whtr < 0.5;
-    out += `<div class="box ${okW&&okR?"":"warn"}"><h3>${ICON("tape")}รอบเอว</h3>
-      รอบเอว <b>${f1(ws)} ซม.</b> — ${okW ? "✅ อยู่ในเกณฑ์" : "⚠️ เกินเกณฑ์"} (${sex==="b"?"ชาย":"หญิง"}ควรน้อยกว่า ${cut} ซม.)<br>
-      รอบเอวต่อส่วนสูง <b>${whtr.toFixed(2)}</b> — ${okR ? "✅ อยู่ในเกณฑ์" : "⚠️ เกินเกณฑ์"} (ควรน้อยกว่า 0.5 หรือรอบเอวไม่เกินครึ่งหนึ่งของส่วนสูง)
+    const cut = sex==="b" ? 90 : 80, whtr = ws/(hm*100), okW = ws < cut, okR = whtr < 0.5;
+    waistStat = ["รอบเอว", `${f1(ws)} ซม.`, "tape", "orange",
+      `${okW&&okR?ICON("ok"):ICON("alert")}<span class="${okW&&okR?"up":"dn"}">ต่อส่วนสูง ${whtr.toFixed(2)} · ${okW&&okR?"ผ่าน":"เกินเกณฑ์"}</span>`];
+    waistBox = `<div class="box ${okW&&okR?"":"warn"}"><h3>${ICON("tape")}รอบเอว</h3>
+      รอบเอว <b>${f1(ws)} ซม.</b> — ${okW ? "อยู่ในเกณฑ์" : "เกินเกณฑ์"} (${sex==="b"?"ชาย":"หญิง"}ควรน้อยกว่า ${cut} ซม.)<br>
+      รอบเอวต่อส่วนสูง <b>${whtr.toFixed(2)}</b> — ${okR ? "อยู่ในเกณฑ์" : "เกินเกณฑ์"} (ควรน้อยกว่า 0.5)
       ${okW&&okR ? "" : "<br>ไขมันหน้าท้องสูงเพิ่มความเสี่ยงโรคเบาหวานและโรคหัวใจ แม้ BMI จะปกติก็ตาม"}</div>`;
   }
-  out += markRow(adultTable(bands), i);
+  const okBand = i===1;
+  renderStats([
+    ["ค่า BMI", f1(bmi), "calc", "purple", "กก./ม²"],
+    ["ระดับ", `<span style="color:${cv(b.c)}">${b.n}</span>`, "heart", "yellow", `${okBand?ICON("ok"):ICON("alert")}<span class="${okBand?"up":"dn"}">${okBand?"สุขภาพดี":"ควรดูแลน้ำหนัก"}</span>`, true],
+    ["น้ำหนักที่เหมาะสม", `${f1(lo)}–${f1(hi-0.1)}`, "target", "green", diffStat, true],
+    waistStat
+  ]);
+  out += `<div class="gauge-head"><div class="big" style="color:${cv(b.c)}">${f1(bmi)}</div>${badge(b)}</div>`;
+  out += scaleHTML(bands, 14, 40, bmi, v => v);
+  out += `<div class="info2">น้ำหนักที่เหมาะสมสำหรับส่วนสูง ${f1(hm*100)} ซม. คือ <b>${f1(lo)} – ${f1(hi-0.1)} กก.</b> · ${diffTxt}</div>`;
+  out += `<div class="box"><h3>${ICON("bulb")}คำแนะนำ</h3>${b.tip}</div>` + waistBox;
+  out += adultTable(bands, i);
   return out;
 }
+
+emptyStats();
 changed();
 </script>
 </body>
