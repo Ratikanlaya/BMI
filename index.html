@@ -9,175 +9,452 @@
 <style>
   :root{
     --bg:#fff4ea; --card:#ffffff; --ink:#3a1f0f; --muted:#8a6a55; --line:#f6d9c0;
-    --accent:#f26b1d; --accent-soft:#ffe3cc;
-    --c1:#5b8fd6; --c2:#3fa36b; --c3:#e0b23a; --c4:#e07b39; --c5:#c9443b;
+    --accent:#f26b1d; --accent-soft:#ffe3cc; --warn-bg:#fff1d6; --err:#c9443b;
+    --c0:#3b5fa8; --c1:#5b8fd6; --c2:#3fa36b; --c3:#e0b23a; --c4:#e07b39; --c5:#c9443b;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --bg:#1c130d; --card:#2a1c13; --ink:#fdeee2; --muted:#c29c80; --line:#4a3122; --accent:#ff8a3d; --accent-soft:#4a2a14; }
+    :root{ --bg:#1c130d; --card:#2a1c13; --ink:#fdeee2; --muted:#c29c80; --line:#4a3122;
+           --accent:#ff8a3d; --accent-soft:#4a2a14; --warn-bg:#3d2a10; --err:#ff7a6e; }
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);
        min-height:100vh;display:flex;justify-content:center;padding:32px 16px}
-  main{width:100%;max-width:480px}
+  main{width:100%;max-width:520px}
   h1{font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em;color:var(--accent)}
-  .card{box-shadow:0 8px 24px rgba(242,107,29,.10)}
   .sub{color:var(--muted);margin:0 0 24px;font-size:15px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
-  .seg{display:flex;background:var(--accent-soft);border-radius:10px;padding:4px;margin-bottom:18px}
-  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;
-              padding:8px;border-radius:7px;cursor:pointer}
-  .seg button.on{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:0 8px 24px rgba(242,107,29,.10)}
+  .sec{font-size:13px;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;margin:4px 0 2px}
+  .sec + *{margin-top:0}
+  hr{border:0;border-top:1px solid var(--line);margin:20px 0 14px}
+  .seg{display:flex;background:var(--accent-soft);border-radius:10px;padding:4px;gap:4px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:15px;
+              padding:9px;border-radius:7px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.12)}
   label{display:block;font-size:14px;font-weight:500;margin:14px 0 6px}
+  label small{color:var(--muted);font-weight:400}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
   .field:focus-within{border-color:var(--accent)}
-  .field input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:20px;padding:12px 14px;outline:none;min-width:0}
-  .field span{padding:0 14px;color:var(--muted);font-size:14px}
+  .field input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:18px;padding:11px 12px;outline:none;min-width:0;color-scheme:light dark}
+  .field span{padding:0 12px;color:var(--muted);font-size:14px}
   input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
-  .go{width:100%;margin-top:20px;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:600;
+  .agehint{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.2em}
+  .agehint b{color:var(--ink)}
+  .go{width:100%;margin-top:22px;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:600;
       color:#fff;background:var(--accent);cursor:pointer;box-shadow:0 4px 14px rgba(242,107,29,.30);transition:transform .08s,filter .15s}
   .go:hover{filter:brightness(1.06)}
   .go:active{transform:scale(.98)}
   .go.stale{animation:pulse 1.4s ease-in-out infinite}
   @keyframes pulse{50%{box-shadow:0 4px 22px rgba(242,107,29,.55)}}
+  .err{color:var(--err);font-size:14px;margin-top:12px;line-height:1.6}
+  .err:empty{display:none}
   #out{animation:fade .3s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  .result{margin-top:20px;text-align:center}
-  .num{font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em;transition:color .2s}
+  .refname{font-size:12px;color:var(--muted);text-align:center;margin-top:18px}
+  .result{margin-top:6px;text-align:center}
+  .num{font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em}
+  .unit{font-size:14px;color:var(--muted);margin-top:4px}
   .cat{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:99px;font-weight:600;font-size:15px;color:#fff}
-  .bar{position:relative;display:flex;height:12px;border-radius:99px;overflow:hidden;margin:26px 0 6px}
+  .cat small{font-weight:400;opacity:.85;margin-left:6px}
+  .zline{margin-top:10px;font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .zline b{color:var(--ink)}
+  .barwrap{position:relative;margin-top:24px}
+  .bar{display:flex;height:12px;border-radius:99px;overflow:hidden}
   .bar div{height:100%}
-  .marker{position:absolute;top:-6px;width:4px;height:24px;background:var(--ink);border-radius:2px;
-          transform:translateX(-50%);transition:left .3s ease}
-  .barwrap{position:relative}
-  .ticks{position:relative;height:16px;font-size:11px;color:var(--muted)}
-  .ticks span{position:absolute;transform:translateX(-50%)}
-  .info{margin-top:18px;font-size:14px;color:var(--muted);line-height:1.6;text-align:left;border-top:1px solid var(--line);padding-top:14px}
+  .marker{position:absolute;top:-6px;width:4px;height:24px;background:var(--ink);border-radius:2px;transform:translateX(-50%);transition:left .3s ease}
+  .ticks{position:relative;height:18px;font-size:11px;color:var(--muted);margin-top:4px}
+  .ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+  .info{margin-top:16px;font-size:14px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:14px}
   .info b{color:var(--ink)}
-  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
-  td{padding:8px 4px;border-bottom:1px solid var(--line)}
+  .box{margin-top:14px;padding:12px 14px;border-radius:10px;background:var(--accent-soft);font-size:14px;line-height:1.7}
+  .box.warn{background:var(--warn-bg)}
+  .box h3{margin:0 0 4px;font-size:15px}
+  table{width:100%;border-collapse:collapse;margin-top:14px;font-size:14px}
+  td{padding:8px 4px;border-bottom:1px solid var(--line);vertical-align:top}
   td:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
   tr.active td{font-weight:600;color:var(--ink)}
   .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
-  .note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.6}
+  .adultseg{margin-top:16px}
+  .note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:18px}
+  .note ul{margin:4px 0 0;padding-left:18px}
+  .refs{font-size:12px;color:var(--muted);line-height:1.7;margin-top:20px}
+  .refs a{color:var(--accent)}
+  /* icons */
+  .ic{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-3px}
+  .brand{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .logo{width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,#ff9a4d,#f26b1d);display:grid;place-items:center;
+        box-shadow:0 6px 16px rgba(242,107,29,.35);color:#fff}
+  .logo .ic{width:30px;height:30px;stroke-width:2.2}
+  .brand h1{margin:0}
+  label{display:flex;align-items:center;gap:6px}
+  label .ic{color:var(--accent);width:17px;height:17px}
+  .sec{display:flex;align-items:center;gap:6px}
+  .sec .ic{width:16px;height:16px}
+  .mode{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .mode button{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:14px 10px 12px;
+               font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s}
+  .mode button:hover{border-color:var(--accent)}
+  .mode .mic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);margin-bottom:4px;transition:all .15s}
+  .mode .mic .ic{width:30px;height:30px}
+  .mode b{font-size:17px}
+  .mode small{font-size:12px;color:var(--muted)}
+  .mode button.on{border-color:var(--accent);background:var(--accent-soft)}
+  .mode button.on .mic{background:var(--accent);color:#fff;transform:scale(1.05)}
+  .seg button{display:flex;align-items:center;justify-content:center;gap:6px}
+  .box h3{display:flex;align-items:center;gap:6px}
+  .note b, .refs b{display:inline-flex;align-items:center;gap:5px}
+  .gobtn-ic{width:20px;height:20px;vertical-align:-4px;margin-right:6px}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A4.8 4.8 0 0 1 12 6.3a4.8 4.8 0 0 1 7.5 6.3z"/><path d="M3.5 12h4l1.5-3 3 6 1.5-3h7"/></symbol>
+  <symbol id="i-child" viewBox="0 0 24 24"><circle cx="12" cy="6.5" r="3.5"/><path d="M8.5 21v-4.5l-2-2.5 2.5-3h6l2.5 3-2 2.5V21"/><path d="M10.5 17v4M13.5 17v4"/></symbol>
+  <symbol id="i-adult" viewBox="0 0 24 24"><circle cx="12" cy="4.5" r="2.5"/><path d="M8 22v-7.5L6.5 13V9.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2V13L16 14.5V22"/><path d="M12 14v8"/></symbol>
+  <symbol id="i-male" viewBox="0 0 24 24"><circle cx="10" cy="14" r="5.5"/><path d="M14 10l6-6M15 4h5v5"/></symbol>
+  <symbol id="i-female" viewBox="0 0 24 24"><circle cx="12" cy="9" r="5.5"/><path d="M12 14.5V22M8.5 18.5h7"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></symbol>
+  <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="1.5"/><path d="M7 6.5h4M7 10h2.5M7 13.5h4M7 17h2.5"/></symbol>
+  <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4"/><path d="M8 9.5a5 5 0 0 1 8 0"/><path d="M12 12.5l1.8-3"/></symbol>
+  <symbol id="i-tape" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9" ry="4.5"/><path d="M6 10.8v2.4M9 11.5v1.6M12 7.5v2M15 11.5v1.6M18 10.8v2.4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-body" viewBox="0 0 24 24"><path d="M12 3v18M5 7h14M8 21l4-8 4 8"/><circle cx="12" cy="3" r="0.6"/></symbol>
+  <symbol id="i-calc" viewBox="0 0 24 24"><rect x="5" y="2.5" width="14" height="19" rx="2.5"/><path d="M8 6.5h8M8.5 11h.01M12 11h.01M15.5 11h.01M8.5 14.5h.01M12 14.5h.01M15.5 14.5h.01M8.5 18h.01M12 18h.01M15.5 18h.01"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4 2.6 17.5A2 2 0 0 0 4.3 20.5h15.4a2 2 0 0 0 1.7-3L13.7 4a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4M12 17h.01"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 21.5s8-3.5 8-10V5.5l-8-3-8 3v6c0 6.5 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 2h13v-4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4 3-6.5 7.5-6.5 0 4.2-3 6.5-7.5 6.5z"/><path d="M12 14.5C12 11 9.5 9 5 9c0 3.7 2.6 5.5 7 5.5z"/></symbol>
+</svg>
 <main>
-  <h1>คำนวณ BMI</h1>
-  <p class="sub">ดัชนีมวลกาย (Body Mass Index) = น้ำหนัก (กก.) ÷ ส่วนสูง (ม.)²</p>
+  <div class="brand">
+    <div class="logo"><svg class="ic"><use href="#i-heart"/></svg></div>
+    <div>
+      <h1>คำนวณ BMI</h1>
+      <p class="sub" style="margin:0">ดัชนีมวลกาย สำหรับเด็ก (2 ปีขึ้นไป) และผู้ใหญ่ ตามเกณฑ์องค์การอนามัยโลก</p>
+    </div>
+  </div>
+  <div style="height:20px"></div>
 
   <div class="card">
-    <div class="seg" role="tablist" aria-label="เกณฑ์">
-      <button id="stdAsia" class="on" type="button">เกณฑ์คนเอเชีย</button>
-      <button id="stdWho" type="button">เกณฑ์ WHO สากล</button>
+    <div class="mode" id="modeSeg" role="tablist" aria-label="เลือกกลุ่มอายุ">
+      <button type="button" data-mode="kid">
+        <span class="mic"><svg class="ic"><use href="#i-child"/></svg></span>
+        <b>เด็กและวัยรุ่น</b><small>อายุ 2 – 19 ปี</small>
+      </button>
+      <button type="button" data-mode="adult" class="on">
+        <span class="mic"><svg class="ic"><use href="#i-adult"/></svg></span>
+        <b>ผู้ใหญ่</b><small>อายุ 18 ปีขึ้นไป</small>
+      </button>
     </div>
 
-    <label for="h">ส่วนสูง</label>
-    <div class="field"><input id="h" type="number" inputmode="decimal" min="50" max="250" value="165"><span>ซม.</span></div>
-    <input id="hr" type="range" min="100" max="220" value="165" aria-label="ส่วนสูง">
-
-    <label for="w">น้ำหนัก</label>
-    <div class="field"><input id="w" type="number" inputmode="decimal" min="10" max="300" value="60"><span>กก.</span></div>
-    <input id="wr" type="range" min="30" max="150" value="60" aria-label="น้ำหนัก">
-
-    <button id="go" class="go" type="button">คำนวณ BMI</button>
-
-    <div id="out" hidden>
-    <div class="result" aria-live="polite">
-      <div class="num" id="bmi">–</div>
-      <div class="cat" id="cat">–</div>
+    <div class="sec"><svg class="ic"><use href="#i-user"/></svg>ข้อมูลผู้ถูกวัด</div>
+    <label>เพศ</label>
+    <div class="seg" id="sexSeg">
+      <button type="button" data-sex="b"><svg class="ic"><use href="#i-male"/></svg>ชาย</button>
+      <button type="button" data-sex="g"><svg class="ic"><use href="#i-female"/></svg>หญิง</button>
+    </div>
+    <div id="kidFields" hidden>
+      <div class="row">
+        <div><label for="dob"><svg class="ic"><use href="#i-cal"/></svg>วันเกิด</label><div class="field"><input id="dob" type="date"></div></div>
+        <div><label for="dom"><svg class="ic"><use href="#i-check"/></svg>วันที่วัด</label><div class="field"><input id="dom" type="date"></div></div>
+      </div>
+      <div class="agehint" id="agehint"></div>
     </div>
 
-    <div class="barwrap">
-      <div class="bar" id="bar"></div>
-      <div class="marker" id="marker"></div>
+    <hr>
+    <div class="sec"><svg class="ic"><use href="#i-body"/></svg>สัดส่วนร่างกาย</div>
+    <label for="h"><svg class="ic"><use href="#i-ruler"/></svg>ส่วนสูง</label>
+    <div class="field"><input id="h" type="number" inputmode="decimal" step="0.1" value="165"><span>ซม.</span></div>
+    <input id="hr" type="range" min="60" max="210" step="0.5" value="165" aria-label="ส่วนสูง">
+
+    <label for="w"><svg class="ic"><use href="#i-scale"/></svg>น้ำหนัก</label>
+    <div class="field"><input id="w" type="number" inputmode="decimal" step="0.1" value="60"><span>กก.</span></div>
+    <input id="wr" type="range" min="5" max="150" step="0.5" value="60" aria-label="น้ำหนัก">
+
+    <div id="waistWrap">
+      <label for="waist"><svg class="ic"><use href="#i-tape"/></svg>รอบเอว <small>(ไม่บังคับ · วัดระดับสะดือ)</small></label>
+      <div class="field"><input id="waist" type="number" inputmode="decimal" step="0.1" placeholder="เช่น 78"><span>ซม.</span></div>
     </div>
-    <div class="ticks" id="ticks"></div>
 
-    <div class="info" id="info"></div>
+    <button id="go" class="go" type="button"><svg class="ic gobtn-ic"><use href="#i-calc"/></svg>คำนวณ BMI</button>
+    <div class="err" id="err" role="alert"></div>
 
-    <table id="tbl"></table>
+    <div id="out" hidden aria-live="polite"></div>
+
+    <div class="note">
+      <b><svg class="ic"><use href="#i-info"/></svg>ข้อควรทราบ</b> ผลนี้เป็นการประเมินเบื้องต้น ไม่ใช่การวินิจฉัย BMI ไม่แยกกล้ามเนื้อกับไขมัน จึงไม่เหมาะกับ:
+      <ul>
+        <li>หญิงตั้งครรภ์หรือให้นมบุตร</li>
+        <li>นักกีฬาหรือผู้ที่มีกล้ามเนื้อมาก</li>
+        <li>ผู้สูงอายุ และผู้พิการบางกลุ่ม</li>
+      </ul>
+      หากกังวลเรื่องน้ำหนักหรือการเจริญเติบโต ควรปรึกษาแพทย์หรือนักโภชนาการ<br>
+      <b><svg class="ic"><use href="#i-shield"/></svg></b> ข้อมูลทั้งหมดคำนวณบนเครื่องของคุณ ไม่มีการส่งหรือจัดเก็บไว้ที่ใด
     </div>
 
-    <p class="note">BMI เป็นตัวชี้วัดเบื้องต้น ไม่ได้แยกกล้ามเนื้อกับไขมัน และไม่เหมาะกับเด็ก หญิงตั้งครรภ์ หรือนักกีฬา ควรปรึกษาแพทย์เพื่อประเมินสุขภาพที่แม่นยำ</p>
+    <div class="refs">
+      <b><svg class="ic"><use href="#i-book"/></svg>แหล่งอ้างอิง</b><br>
+      • WHO Child Growth Standards (2006) — BMI-for-age อายุ 2–5 ปี<br>
+      • WHO Growth Reference 5–19 years (2007) — <a href="https://www.who.int/tools/growth-reference-data-for-5to19-years/indicators/bmi-for-age">BMI-for-age</a><br>
+      • WHO Expert Consultation (2004) — เกณฑ์ BMI สำหรับประชากรเอเชีย (Lancet 363:157–163)
+    </div>
   </div>
 </main>
 
 <script>
-const STD = {
-  asia: [
-    {name:"น้ำหนักน้อย / ผอม", max:18.5, color:"var(--c1)", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
-    {name:"ปกติ (สุขภาพดี)",   max:23,   color:"var(--c2)", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
-    {name:"ท้วม / โรคอ้วนระดับ 1", max:25, color:"var(--c3)", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
-    {name:"อ้วน / โรคอ้วนระดับ 2", max:30, color:"var(--c4)", tip:"เสี่ยงต่อเบาหวาน ความดันสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
-    {name:"อ้วนมาก / โรคอ้วนระดับ 3", max:Infinity, color:"var(--c5)", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}
-  ],
-  who: [
-    {name:"น้ำหนักน้อย", max:18.5, color:"var(--c1)", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
-    {name:"ปกติ",        max:25,   color:"var(--c2)", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
-    {name:"น้ำหนักเกิน", max:30,   color:"var(--c3)", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
-    {name:"อ้วนระดับ 1", max:35,   color:"var(--c4)", tip:"เสี่ยงต่อเบาหวาน ความดันสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
-    {name:"อ้วนระดับ 2 ขึ้นไป", max:Infinity, color:"var(--c5)", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}
-  ]
+/* WHO LMS, BMI-for-age, index = age in completed months − 24 (24…228).
+   24–60 mo: WHO Child Growth Standards 2006; 61–228 mo: WHO Growth Reference 2007. [L, M, S] */
+const LMS = {"b":[[-0.6187,16.0189,0.07785],[-0.584,15.98,0.07792],[-0.5497,15.9414,0.078],[-0.5166,15.9036,0.07808],[-0.485,15.8667,0.07818],[-0.4552,15.8306,0.07829],[-0.4274,15.7953,0.07841],[-0.4016,15.7606,0.07854],[-0.3782,15.7267,0.07867],[-0.3572,15.6934,0.07882],[-0.3388,15.661,0.07897],[-0.3231,15.6294,0.07914],[-0.3101,15.5988,0.07931],[-0.3,15.5693,0.0795],[-0.2927,15.541,0.07969],[-0.2884,15.514,0.0799],[-0.2869,15.4885,0.08012],[-0.2881,15.4645,0.08036],[-0.2919,15.442,0.08061],[-0.2981,15.421,0.08087],[-0.3067,15.4013,0.08115],[-0.3174,15.3827,0.08144],[-0.3303,15.3652,0.08174],[-0.3452,15.3485,0.08205],[-0.3622,15.3326,0.08238],[-0.3811,15.3174,0.08272],[-0.4019,15.3029,0.08307],[-0.4245,15.2891,0.08343],[-0.4488,15.2759,0.0838],[-0.4747,15.2633,0.08418],[-0.5019,15.2514,0.08457],[-0.5303,15.24,0.08496],[-0.5599,15.2291,0.08536],[-0.5905,15.2188,0.08577],[-0.6223,15.2091,0.08617],[-0.6552,15.2,0.08659],[-0.6892,15.1916,0.087],[-0.7387,15.2641,0.0839],[-0.7621,15.2616,0.08414],[-0.7856,15.2604,0.08439],[-0.8089,15.2605,0.08464],[-0.8322,15.2619,0.0849],[-0.8554,15.2645,0.08516],[-0.8785,15.2684,0.08543],[-0.9015,15.2737,0.0857],[-0.9243,15.2801,0.08597],[-0.9471,15.2877,0.08625],[-0.9697,15.2965,0.08653],[-0.9921,15.3062,0.08682],[-1.0144,15.3169,0.08711],[-1.0365,15.3285,0.08741],[-1.0584,15.3408,0.08771],[-1.0801,15.354,0.08802],[-1.1017,15.3679,0.08833],[-1.123,15.3825,0.08865],[-1.1441,15.3978,0.08898],[-1.1649,15.4137,0.08931],[-1.1856,15.4302,0.08964],[-1.206,15.4473,0.08998],[-1.2261,15.465,0.09033],[-1.246,15.4832,0.09068],[-1.2656,15.5019,0.09103],[-1.2849,15.521,0.09139],[-1.304,15.5407,0.09176],[-1.3228,15.5608,0.09213],[-1.3414,15.5814,0.09251],[-1.3596,15.6023,0.09289],[-1.3776,15.6237,0.09327],[-1.3953,15.6455,0.09366],[-1.4126,15.6677,0.09406],[-1.4297,15.6903,0.09445],[-1.4464,15.7133,0.09486],[-1.4629,15.7368,0.09526],[-1.479,15.7606,0.09567],[-1.4947,15.7848,0.09609],[-1.5101,15.8094,0.09651],[-1.5252,15.8344,0.09693],[-1.5399,15.8597,0.09735],[-1.5542,15.8855,0.09778],[-1.5681,15.9116,0.09821],[-1.5817,15.9381,0.09864],[-1.5948,15.9651,0.09907],[-1.6076,15.9925,0.09951],[-1.6199,16.0205,0.09994],[-1.6318,16.049,0.10038],[-1.6433,16.0781,0.10082],[-1.6544,16.1078,0.10126],[-1.6651,16.1381,0.1017],[-1.6753,16.1692,0.10214],[-1.6851,16.2009,0.10259],[-1.6944,16.2333,0.10303],[-1.7032,16.2665,0.10347],[-1.7116,16.3004,0.10391],[-1.7196,16.3351,0.10435],[-1.7271,16.3704,0.10478],[-1.7341,16.4065,0.10522],[-1.7407,16.4433,0.10566],[-1.7468,16.4807,0.10609],[-1.7525,16.5189,0.10652],[-1.7578,16.5578,0.10695],[-1.7626,16.5974,0.10738],[-1.767,16.6376,0.1078],[-1.771,16.6786,0.10823],[-1.7745,16.7203,0.10865],[-1.7777,16.7628,0.10906],[-1.7804,16.8059,0.10948],[-1.7828,16.8497,0.10989],[-1.7847,16.8941,0.1103],[-1.7862,16.9392,0.1107],[-1.7873,16.985,0.1111],[-1.7881,17.0314,0.1115],[-1.7884,17.0784,0.11189],[-1.7884,17.1262,0.11228],[-1.788,17.1746,0.11266],[-1.7873,17.2236,0.11304],[-1.7861,17.2734,0.11342],[-1.7846,17.324,0.11379],[-1.7828,17.3752,0.11415],[-1.7806,17.4272,0.11451],[-1.778,17.4799,0.11487],[-1.7751,17.5334,0.11522],[-1.7719,17.5877,0.11556],[-1.7684,17.6427,0.1159],[-1.7645,17.6985,0.11623],[-1.7604,17.7551,0.11656],[-1.7559,17.8124,0.11688],[-1.7511,17.8704,0.1172],[-1.7461,17.9292,0.11751],[-1.7408,17.9887,0.11781],[-1.7352,18.0488,0.11811],[-1.7293,18.1096,0.11841],[-1.7232,18.171,0.11869],[-1.7168,18.233,0.11898],[-1.7102,18.2955,0.11925],[-1.7033,18.3586,0.11952],[-1.6962,18.4221,0.11979],[-1.6888,18.486,0.12005],[-1.6811,18.5502,0.1203],[-1.6732,18.6148,0.12055],[-1.6651,18.6795,0.12079],[-1.6568,18.7445,0.12102],[-1.6482,18.8095,0.12125],[-1.6394,18.8746,0.12148],[-1.6304,18.9398,0.1217],[-1.6211,19.005,0.12191],[-1.6116,19.0701,0.12212],[-1.602,19.1351,0.12233],[-1.5921,19.2,0.12253],[-1.5821,19.2648,0.12272],[-1.5719,19.3294,0.12291],[-1.5615,19.3937,0.1231],[-1.551,19.4578,0.12328],[-1.5403,19.5217,0.12346],[-1.5294,19.5853,0.12363],[-1.5185,19.6486,0.1238],[-1.5074,19.7117,0.12396],[-1.4961,19.7744,0.12412],[-1.4848,19.8367,0.12428],[-1.4733,19.8987,0.12443],[-1.4617,19.9603,0.12458],[-1.45,20.0215,0.12473],[-1.4382,20.0823,0.12487],[-1.4263,20.1427,0.12501],[-1.4143,20.2026,0.12514],[-1.4022,20.2621,0.12528],[-1.39,20.3211,0.12541],[-1.3777,20.3796,0.12554],[-1.3653,20.4376,0.12567],[-1.3529,20.4951,0.12579],[-1.3403,20.5521,0.12591],[-1.3277,20.6085,0.12603],[-1.3149,20.6644,0.12615],[-1.3021,20.7197,0.12627],[-1.2892,20.7745,0.12638],[-1.2762,20.8287,0.1265],[-1.2631,20.8824,0.12661],[-1.2499,20.9355,0.12672],[-1.2366,20.9881,0.12683],[-1.2233,21.04,0.12694],[-1.2098,21.0914,0.12704],[-1.1962,21.1423,0.12715],[-1.1826,21.1925,0.12726],[-1.1688,21.2423,0.12736],[-1.155,21.2914,0.12746],[-1.141,21.34,0.12756],[-1.127,21.388,0.12767],[-1.1129,21.4354,0.12777],[-1.0986,21.4822,0.12787],[-1.0843,21.5285,0.12797],[-1.0699,21.5742,0.12807],[-1.0553,21.6193,0.12816],[-1.0407,21.6638,0.12826],[-1.026,21.7077,0.12836],[-1.0112,21.751,0.12845],[-0.9962,21.7937,0.12855],[-0.9812,21.8358,0.12864],[-0.9661,21.8773,0.12874],[-0.9509,21.9182,0.12883],[-0.9356,21.9585,0.12893],[-0.9202,21.9982,0.12902],[-0.9048,22.0374,0.12911],[-0.8892,22.076,0.1292],[-0.8735,22.114,0.1293],[-0.8578,22.1514,0.12939],[-0.8419,22.1883,0.12948]],"g":[[-0.5684,15.6881,0.08454],[-0.5684,15.659,0.08452],[-0.5684,15.6308,0.08449],[-0.5684,15.6037,0.08446],[-0.5684,15.5777,0.08444],[-0.5684,15.5523,0.08443],[-0.5684,15.5276,0.08444],[-0.5684,15.5034,0.08448],[-0.5684,15.4798,0.08455],[-0.5684,15.4572,0.08467],[-0.5684,15.4356,0.08484],[-0.5684,15.4155,0.08506],[-0.5684,15.3968,0.08535],[-0.5684,15.3796,0.08569],[-0.5684,15.3638,0.08609],[-0.5684,15.3493,0.08654],[-0.5684,15.3358,0.08704],[-0.5684,15.3233,0.08757],[-0.5684,15.3116,0.08813],[-0.5684,15.3007,0.08872],[-0.5684,15.2905,0.08931],[-0.5684,15.2814,0.08991],[-0.5684,15.2732,0.09051],[-0.5684,15.2661,0.0911],[-0.5684,15.2602,0.09168],[-0.5684,15.2556,0.09227],[-0.5684,15.2523,0.09286],[-0.5684,15.2503,0.09345],[-0.5684,15.2496,0.09403],[-0.5684,15.2502,0.0946],[-0.5684,15.2519,0.09515],[-0.5684,15.2544,0.09568],[-0.5684,15.2575,0.09618],[-0.5684,15.2612,0.09665],[-0.5684,15.2653,0.09709],[-0.5684,15.2698,0.0975],[-0.5684,15.2747,0.09789],[-0.8886,15.2441,0.09692],[-0.9068,15.2434,0.09738],[-0.9248,15.2433,0.09783],[-0.9427,15.2438,0.09829],[-0.9605,15.2448,0.09875],[-0.978,15.2464,0.0992],[-0.9954,15.2487,0.09966],[-1.0126,15.2516,0.10012],[-1.0296,15.2551,0.10058],[-1.0464,15.2592,0.10104],[-1.063,15.2641,0.10149],[-1.0794,15.2697,0.10195],[-1.0956,15.276,0.10241],[-1.1115,15.2831,0.10287],[-1.1272,15.2911,0.10333],[-1.1427,15.2998,0.10379],[-1.1579,15.3095,0.10425],[-1.1728,15.32,0.10471],[-1.1875,15.3314,0.10517],[-1.2019,15.3439,0.10562],[-1.216,15.3572,0.10608],[-1.2298,15.3717,0.10654],[-1.2433,15.3871,0.107],[-1.2565,15.4036,0.10746],[-1.2693,15.4211,0.10792],[-1.2819,15.4397,0.10837],[-1.2941,15.4593,0.10883],[-1.306,15.4798,0.10929],[-1.3175,15.5014,0.10974],[-1.3287,15.524,0.1102],[-1.3395,15.5476,0.11065],[-1.3499,15.5723,0.1111],[-1.36,15.5979,0.11156],[-1.3697,15.6246,0.11201],[-1.379,15.6523,0.11246],[-1.388,15.681,0.11291],[-1.3966,15.7107,0.11335],[-1.4047,15.7415,0.1138],[-1.4125,15.7732,0.11424],[-1.4199,15.8058,0.11469],[-1.427,15.8394,0.11513],[-1.4336,15.8738,0.11557],[-1.4398,15.909,0.11601],[-1.4456,15.9451,0.11644],[-1.4511,15.9818,0.11688],[-1.4561,16.0194,0.11731],[-1.4607,16.0575,0.11774],[-1.465,16.0964,0.11816],[-1.4688,16.1358,0.11859],[-1.4723,16.1759,0.11901],[-1.4753,16.2166,0.11943],[-1.478,16.258,0.11985],[-1.4803,16.2999,0.12026],[-1.4823,16.3425,0.12067],[-1.4838,16.3858,0.12108],[-1.485,16.4298,0.12148],[-1.4859,16.4746,0.12188],[-1.4864,16.52,0.12228],[-1.4866,16.5663,0.12268],[-1.4864,16.6133,0.12307],[-1.4859,16.6612,0.12346],[-1.4851,16.71,0.12384],[-1.4839,16.7595,0.12422],[-1.4825,16.81,0.1246],[-1.4807,16.8614,0.12497],[-1.4787,16.9136,0.12534],[-1.4763,16.9667,0.12571],[-1.4737,17.0208,0.12607],[-1.4708,17.0757,0.12643],[-1.4677,17.1316,0.12678],[-1.4642,17.1883,0.12713],[-1.4606,17.2459,0.12748],[-1.4567,17.3044,0.12782],[-1.4526,17.3637,0.12816],[-1.4482,17.4238,0.12849],[-1.4436,17.4847,0.12882],[-1.4389,17.5464,0.12914],[-1.4339,17.6088,0.12946],[-1.4288,17.6719,0.12978],[-1.4235,17.7357,0.13009],[-1.418,17.8001,0.1304],[-1.4123,17.8651,0.1307],[-1.4065,17.9306,0.13099],[-1.4006,17.9966,0.13129],[-1.3945,18.063,0.13158],[-1.3883,18.1297,0.13186],[-1.3819,18.1967,0.13214],[-1.3755,18.2639,0.13241],[-1.3689,18.3312,0.13268],[-1.3621,18.3986,0.13295],[-1.3553,18.466,0.13321],[-1.3483,18.5333,0.13347],[-1.3413,18.6006,0.13372],[-1.3341,18.6677,0.13397],[-1.3269,18.7346,0.13421],[-1.3195,18.8012,0.13445],[-1.3121,18.8675,0.13469],[-1.3046,18.9335,0.13492],[-1.297,18.9991,0.13514],[-1.2894,19.0642,0.13537],[-1.2816,19.1289,0.13559],[-1.2739,19.1931,0.1358],[-1.2661,19.2567,0.13601],[-1.2583,19.3197,0.13622],[-1.2504,19.382,0.13642],[-1.2425,19.4437,0.13662],[-1.2345,19.5045,0.13681],[-1.2266,19.5647,0.137],[-1.2186,19.624,0.13719],[-1.2107,19.6824,0.13738],[-1.2027,19.74,0.13756],[-1.1947,19.7966,0.13774],[-1.1867,19.8523,0.13791],[-1.1788,19.907,0.13808],[-1.1708,19.9607,0.13825],[-1.1629,20.0133,0.13841],[-1.1549,20.0648,0.13858],[-1.147,20.1152,0.13873],[-1.139,20.1644,0.13889],[-1.1311,20.2125,0.13904],[-1.1232,20.2595,0.1392],[-1.1153,20.3053,0.13934],[-1.1074,20.3499,0.13949],[-1.0996,20.3934,0.13963],[-1.0917,20.4357,0.13977],[-1.0838,20.4769,0.13991],[-1.076,20.517,0.14005],[-1.0681,20.556,0.14018],[-1.0603,20.5938,0.14031],[-1.0525,20.6306,0.14044],[-1.0447,20.6663,0.14057],[-1.0368,20.7008,0.1407],[-1.029,20.7344,0.14082],[-1.0212,20.7668,0.14094],[-1.0134,20.7982,0.14106],[-1.0055,20.8286,0.14118],[-0.9977,20.858,0.1413],[-0.9898,20.8863,0.14142],[-0.9819,20.9137,0.14153],[-0.974,20.9401,0.14164],[-0.9661,20.9656,0.14176],[-0.9582,20.9901,0.14187],[-0.9503,21.0138,0.14198],[-0.9423,21.0367,0.14208],[-0.9344,21.0587,0.14219],[-0.9264,21.0801,0.1423],[-0.9184,21.1007,0.1424],[-0.9104,21.1206,0.1425],[-0.9024,21.1399,0.14261],[-0.8944,21.1586,0.14271],[-0.8863,21.1768,0.14281],[-0.8783,21.1944,0.14291],[-0.8703,21.2116,0.14301],[-0.8623,21.2282,0.14311],[-0.8542,21.2444,0.1432],[-0.8462,21.2603,0.1433],[-0.8382,21.2757,0.1434],[-0.8301,21.2908,0.14349],[-0.8221,21.3055,0.14359],[-0.814,21.32,0.14368],[-0.806,21.3341,0.14377],[-0.798,21.348,0.14386],[-0.7899,21.3617,0.14396],[-0.7819,21.3752,0.14405],[-0.7738,21.3884,0.14414],[-0.7658,21.4014,0.14423],[-0.7577,21.4143,0.14432],[-0.7496,21.4269,0.14441]]};
+
+const ADULT = {
+  asia:{label:"เกณฑ์คนเอเชีย (WHO 2004)", bands:[
+    {n:"น้ำหนักน้อย / ผอม", hi:18.5, c:"--c1", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
+    {n:"ปกติ (สุขภาพดี)", hi:23, c:"--c2", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
+    {n:"ท้วม / โรคอ้วนระดับ 1", hi:25, c:"--c3", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
+    {n:"อ้วน / โรคอ้วนระดับ 2", hi:30, c:"--c4", tip:"เสี่ยงต่อเบาหวาน ความดันโลหิตสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
+    {n:"อ้วนมาก / โรคอ้วนระดับ 3", hi:Infinity, c:"--c5", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}]},
+  who:{label:"เกณฑ์ WHO สากล", bands:[
+    {n:"น้ำหนักน้อย", hi:18.5, c:"--c1", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
+    {n:"ปกติ", hi:25, c:"--c2", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
+    {n:"น้ำหนักเกิน", hi:30, c:"--c3", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
+    {n:"อ้วนระดับ 1", hi:35, c:"--c4", tip:"เสี่ยงต่อเบาหวาน ความดันโลหิตสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
+    {n:"อ้วนระดับ 2 ขึ้นไป", hi:Infinity, c:"--c5", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}]}
 };
-const MIN=14, MAX=40;
-let std="asia";
-const $=id=>document.getElementById(id);
-const pos=v=>((Math.min(Math.max(v,MIN),MAX)-MIN)/(MAX-MIN))*100;
+/* children: z-score bands. lower bands: z < hi; upper bands: z <= hi */
+const KID_TIPS = {
+  t3:"ควรพาไปพบแพทย์หรือนักโภชนาการเพื่อประเมินภาวะโภชนาการโดยเร็ว",
+  t2:"ควรดูแลให้ได้รับอาหารครบ 5 หมู่ เพียงพอ และติดตามน้ำหนัก-ส่วนสูงทุก 3 เดือน หากไม่ดีขึ้นควรปรึกษาแพทย์",
+  ok:"การเจริญเติบโตอยู่ในเกณฑ์ดี ส่งเสริมให้กินอาหารหลากหลาย เล่นหรือเคลื่อนไหวอย่างน้อยวันละ 60 นาที และนอนหลับให้เพียงพอ",
+  o1:"ลดเครื่องดื่มรสหวานและขนมกรุบกรอบ เพิ่มผักผลไม้และกิจกรรมทางกาย ไม่ควรให้เด็กอดอาหารหรือลดน้ำหนักเอง",
+  o2:"ควรปรึกษาแพทย์เพื่อวางแผนดูแลน้ำหนักที่เหมาะกับวัย เด็กกำลังเติบโตจึงไม่ควรลดน้ำหนักเองโดยไม่มีผู้ดูแล"
+};
+const KID = {
+  u5:{label:"WHO Child Growth Standards 2006 (อายุ 2–5 ปี)", bands:[
+    {n:"ต่ำกว่าเกณฑ์มาก", en:"Severe wasting", hi:-3, c:"--c0", tip:KID_TIPS.t3},
+    {n:"ต่ำกว่าเกณฑ์", en:"Wasting", hi:-2, c:"--c1", tip:KID_TIPS.t2},
+    {n:"สมส่วน", en:"Normal", hi:2, inc:true, c:"--c2", tip:KID_TIPS.ok},
+    {n:"เกินเกณฑ์", en:"Overweight", hi:3, inc:true, c:"--c3", tip:KID_TIPS.o1},
+    {n:"เกินเกณฑ์มาก", en:"Obesity", hi:Infinity, c:"--c5", tip:KID_TIPS.o2}]},
+  o5:{label:"WHO Growth Reference 2007 (อายุ 5–19 ปี)", bands:[
+    {n:"ต่ำกว่าเกณฑ์มาก", en:"Severe thinness", hi:-3, c:"--c0", tip:KID_TIPS.t3},
+    {n:"ต่ำกว่าเกณฑ์", en:"Thinness", hi:-2, c:"--c1", tip:KID_TIPS.t2},
+    {n:"สมส่วน", en:"Normal", hi:1, inc:true, c:"--c2", tip:KID_TIPS.ok},
+    {n:"เกินเกณฑ์", en:"Overweight", hi:2, inc:true, c:"--c3", tip:KID_TIPS.o1},
+    {n:"เกินเกณฑ์มาก", en:"Obesity", hi:Infinity, c:"--c5", tip:KID_TIPS.o2}]}
+};
 
-function drawScale(){
-  const s=STD[std]; let prev=MIN; let bar="", ticks="";
-  s.forEach(c=>{
-    const end=Math.min(c.max,MAX);
-    bar+=`<div style="width:${pos(end)-pos(prev)}%;background:${c.color}"></div>`;
-    if(c.max!==Infinity) ticks+=`<span style="left:${pos(c.max)}%">${c.max}</span>`;
-    prev=end;
-  });
-  $("bar").innerHTML=bar; $("ticks").innerHTML=ticks;
+const $ = id => document.getElementById(id);
+const cv = v => `var(${v})`;
+const f1 = x => x.toFixed(1);
+const sgn = z => (z>=0?"+":"−")+Math.abs(z).toFixed(2);
+let sex = null, adultStd = "asia", shown = false, mode = "adult";
+const ICON = n => `<svg class="ic"><use href="#i-${n}"/></svg>`;
+
+/* ---------- maths ---------- */
+function ageMonths(dob, dom){
+  let m = (dom.getFullYear()-dob.getFullYear())*12 + (dom.getMonth()-dob.getMonth());
+  if (dom.getDate() < dob.getDate()) m--;
+  return m;
 }
-
-function calc(){
-  const h=parseFloat($("h").value), w=parseFloat($("w").value);
-  const s=STD[std];
-  if(!(h>0&&w>0)){ $("bmi").textContent="–"; $("cat").textContent="กรอกข้อมูล"; $("cat").style.background="var(--muted)"; return; }
-  const m=h/100, bmi=w/(m*m);
-  const i=s.findIndex(c=>bmi<c.max), c=s[i];
-  $("bmi").textContent=bmi.toFixed(1);
-  $("bmi").style.color=c.color;
-  $("cat").textContent=c.name; $("cat").style.background=c.color;
-  $("marker").style.left=pos(bmi)+"%";
-
-  const lo=s[0].max*m*m, hi=s[1].max*m*m;
-  let diff="";
-  if(bmi<s[0].max) diff=`ต้องเพิ่มอีกประมาณ <b>${(lo-w).toFixed(1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`;
-  else if(bmi>=s[1].max) diff=`ต้องลดอีกประมาณ <b>${(w-hi+0.1).toFixed(1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`;
-  else diff=`คุณอยู่ในเกณฑ์ปกติแล้ว 👍`;
-  $("info").innerHTML=`น้ำหนักที่เหมาะสมสำหรับส่วนสูง ${h} ซม. คือ <b>${lo.toFixed(1)} – ${(hi-0.1).toFixed(1)} กก.</b><br>${diff}<br>${c.tip}`;
-
-  let p=0;
-  $("tbl").innerHTML=s.map((c,j)=>{
-    const r = c.max===Infinity ? `≥ ${p}` : (j===0 ? `< ${c.max}` : `${p} – ${(c.max-0.1).toFixed(1)}`);
-    p=c.max;
-    return `<tr class="${j===i?'active':''}"><td><span class="dot" style="background:${c.color}"></span>${c.name}</td><td>${r}</td></tr>`;
-  }).join("");
+const sdVal = ([L,M,S],k) => M*Math.pow(1+L*S*k, 1/L);
+function zScore(x, lms){                       // WHO method, restricted beyond ±3 SD
+  const [L,M,S] = lms;
+  const z = (Math.pow(x/M, L)-1)/(L*S);
+  if (Math.abs(z) <= 3) return z;
+  if (z > 3){ const s3=sdVal(lms,3), s2=sdVal(lms,2); return 3 + (x-s3)/(s3-s2); }
+  const n3=sdVal(lms,-3), n2=sdVal(lms,-2); return -3 - (n3-x)/(n2-n3);
 }
+function erf(x){ const t=1/(1+0.3275911*Math.abs(x));
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return x>=0?y:-y; }
+const pctl = z => 50*(1+erf(z/Math.SQRT2));
+function classifyZ(z, bands){ return bands.findIndex(b => b.inc ? z<=b.hi : z<b.hi); }
+function classifyBMI(v, bands){ return bands.findIndex(b => v<b.hi); }
+const ageText = m => `${Math.floor(m/12)} ปี ${m%12} เดือน`;
 
-let shown=false;
-function markStale(){ if(shown) $("go").classList.add("stale"); }
-function link(num,range){
-  $(num).addEventListener("input",()=>{ $(range).value=$(num).value; markStale(); });
-  $(range).addEventListener("input",()=>{ $(num).value=$(range).value; markStale(); });
-  $(num).addEventListener("keydown",e=>{ if(e.key==="Enter") run(); });
-}
-function run(){
-  shown=true; $("out").hidden=false; $("go").classList.remove("stale");
-  drawScale(); calc();
+/* ---------- inputs ---------- */
+function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+function parseDate(s){ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+$("dom").value = todayStr(); $("dob").max = todayStr();
+
+document.querySelectorAll("#sexSeg button").forEach(b => b.onclick = () => {
+  sex = b.dataset.sex;
+  document.querySelectorAll("#sexSeg button").forEach(x => x.classList.toggle("on", x===b));
+  changed();
+});
+function link(num, range){
+  $(num).addEventListener("input", () => { $(range).value = $(num).value; changed(); });
+  $(range).addEventListener("input", () => { $(num).value = $(range).value; changed(); });
 }
 link("h","hr"); link("w","wr");
-$("go").onclick=run;
-function setStd(k){ std=k; $("stdAsia").classList.toggle("on",k==="asia"); $("stdWho").classList.toggle("on",k==="who"); if(shown){ drawScale(); calc(); } }
-$("stdAsia").onclick=()=>setStd("asia");
-$("stdWho").onclick=()=>setStd("who");
+["dob","dom","waist"].forEach(id => $(id).addEventListener("input", changed));
+["h","w","waist"].forEach(id => $(id).addEventListener("keydown", e => { if(e.key==="Enter") run(); }));
+$("go").onclick = run;
+const DEF = {kid:{h:"120",w:"22"}, adult:{h:"165",w:"60"}};
+function setMode(k){
+  if (k===mode) return;
+  mode = k;
+  document.querySelectorAll("#modeSeg button").forEach(x => x.classList.toggle("on", x.dataset.mode===k));
+  $("kidFields").hidden = k!=="kid";
+  $("waistWrap").hidden = k!=="adult";
+  ["h","w"].forEach(id => { $(id).value = DEF[k][id]; $(id+"r").value = DEF[k][id]; });
+  $("out").hidden = true; $("err").innerHTML = ""; shown = false; $("go").classList.remove("stale");
+  changed();
+}
+document.querySelectorAll("#modeSeg button").forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+function currentAge(){
+  const dob=parseDate($("dob").value), dom=parseDate($("dom").value);
+  if(!dob || !dom || dob>dom) return null;
+  return ageMonths(dob, dom);
+}
+function changed(){
+  const m = currentAge();
+  $("agehint").innerHTML = m==null ? "" :
+    `อายุ <b>${ageText(m)}</b> · ` + (m<24 ? "ยังไม่รองรับ (ต่ำกว่า 2 ปี)" : m<61 ? "ใช้เกณฑ์เด็กเล็ก WHO 2006" :
+      m<=228 ? "ใช้เกณฑ์เด็กและวัยรุ่น WHO 2007" : "เกิน 19 ปี — กรุณาเลือกโหมดผู้ใหญ่");
+  if (shown) $("go").classList.add("stale");
+}
+
+/* ---------- validation ---------- */
+function validate(){
+  const e=[];
+  if(!sex) e.push("กรุณาเลือกเพศ");
+  if (mode==="kid"){
+    const dob=parseDate($("dob").value), dom=parseDate($("dom").value);
+    if(!dob) e.push("กรุณากรอกวันเกิด");
+    if(!dom) e.push("กรุณากรอกวันที่วัด");
+    if(dob && dom && dob>dom) e.push("วันเกิดต้องไม่อยู่หลังวันที่วัด");
+  }
+  const h=parseFloat($("h").value), w=parseFloat($("w").value);
+  if(!(h>=45 && h<=250)) e.push("ส่วนสูงควรอยู่ระหว่าง 45–250 ซม.");
+  if(!(w>=2 && w<=300)) e.push("น้ำหนักควรอยู่ระหว่าง 2–300 กก.");
+  const ws=mode==="adult" ? $("waist").value.trim() : "";
+  if(ws && !(parseFloat(ws)>=30 && parseFloat(ws)<=250)) e.push("รอบเอวควรอยู่ระหว่าง 30–250 ซม.");
+  return e;
+}
+
+/* ---------- rendering helpers ---------- */
+function scaleHTML(bands, lo, hi, val, tickFmt){
+  const pos = v => ((Math.min(Math.max(v,lo),hi)-lo)/(hi-lo))*100;
+  let prev=lo, bar="", ticks="";
+  bands.forEach(b => { const end=Math.min(b.hi,hi);
+    bar += `<div style="width:${pos(end)-pos(prev)}%;background:${cv(b.c)}"></div>`;
+    if(b.hi!==Infinity && b.hi<hi) ticks += `<span style="left:${pos(b.hi)}%">${tickFmt(b.hi)}</span>`;
+    prev=end; });
+  return `<div class="barwrap"><div class="bar">${bar}</div><div class="marker" style="left:${pos(val)}%"></div></div><div class="ticks">${ticks}</div>`;
+}
+function pill(b, i, active){ return `<span class="cat" style="background:${cv(b.c)}">${b.n}${b.en?`<small>${b.en}</small>`:""}</span>`; }
+
+function kidTable(bands, lms){
+  let prev=null;
+  return `<table>${bands.map((b,j)=>{
+    let r;
+    if(j===0) r=`z < ${b.hi} (BMI < ${f1(sdVal(lms,b.hi))})`;
+    else if(b.hi===Infinity) r=`z > ${prev} (BMI > ${f1(sdVal(lms,prev))})`;
+    else r=`${prev>0?"+":""}${prev} ถึง ${b.hi>0?"+":""}${b.hi} (${f1(sdVal(lms,prev))}–${f1(sdVal(lms,b.hi))})`;
+    prev=b.hi;
+    return `<tr data-i="${j}"><td><span class="dot" style="background:${cv(b.c)}"></span>${b.n}</td><td>${r}</td></tr>`;
+  }).join("")}</table>`;
+}
+function adultTable(bands){
+  let p=0;
+  return `<table>${bands.map((b,j)=>{
+    const r = b.hi===Infinity ? `≥ ${p}` : (j===0 ? `< ${b.hi}` : `${p} – ${(b.hi-0.1).toFixed(1)}`);
+    p=b.hi;
+    return `<tr data-i="${j}"><td><span class="dot" style="background:${cv(b.c)}"></span>${b.n}</td><td>${r}</td></tr>`;
+  }).join("")}</table>`;
+}
+const markRow = (html, i) => html.replace(`<tr data-i="${i}">`, `<tr data-i="${i}" class="active">`);
+
+/* ---------- main ---------- */
+function run(){
+  const errs = validate();
+  $("err").innerHTML = errs.join("<br>");
+  if (errs.length){ $("out").hidden = true; return; }
+  shown = true; $("go").classList.remove("stale");
+  const m = currentAge();
+  const h = parseFloat($("h").value), w = parseFloat($("w").value), hm = h/100;
+  const bmi = w/(hm*hm);
+  const who = (m!=null && m>=156 ? "วัยรุ่น" : "เด็ก") + (sex==="b" ? "ชาย" : "หญิง");
+  let html = "";
+
+  if (mode === "adult"){
+    html = adultResult(bmi, hm, w);
+  } else if (m < 24){
+    html = `<div class="box warn"><h3>${ICON("alert")}ยังไม่รองรับอายุต่ำกว่า 2 ปี</h3>เด็กอายุต่ำกว่า 2 ปีประเมินการเจริญเติบโตด้วยน้ำหนักและความยาวตามอายุ แนะนำให้ใช้กราฟในสมุดบันทึกสุขภาพแม่และเด็ก (สมุดสีชมพู) หรือปรึกษาเจ้าหน้าที่สาธารณสุข</div>`;
+  } else if (m > 228){
+    html = `<div class="box warn"><h3>${ICON("alert")}อายุเกิน 19 ปี</h3>เกณฑ์เด็กและวัยรุ่นของ WHO ใช้ได้ถึงอายุ 19 ปี กรุณาเลือกโหมด <b>ผู้ใหญ่</b> ด้านบน</div>`;
+  } else {
+    html = kidResult(m, bmi, hm, who, true);
+    if (m >= 216) html = `<div class="box">${ICON("info")} อายุ 18–19 ปีอยู่ในช่วงต่อระหว่างวัยรุ่นกับผู้ใหญ่ สามารถเทียบกับเกณฑ์ผู้ใหญ่ได้ในโหมด <b>ผู้ใหญ่</b></div>` + html;
+  }
+  $("out").innerHTML = html;
+  $("out").hidden = false;
+  const s = $("adultSeg");
+  if (s) s.querySelectorAll("button").forEach(b => b.onclick = () => { adultStd = b.dataset.std; run(); });
+}
+
+function kidResult(m, bmi, hm, who, primary){
+  const lms = LMS[sex][m-24];
+  const ref = m < 61 ? KID.u5 : KID.o5;
+  const z = zScore(bmi, lms);
+  const p = pctl(z);
+  const head = `<div class="refname">${ref.label} · ${who} อายุ ${ageText(m)}</div>`;
+  const big = primary ? `<div class="num" style="color:${cv(ref.bands[classifyZ(z, ref.bands)].c)}">${f1(bmi)}</div><div class="unit">กก./ม²</div>` : `<div class="unit">BMI ${f1(bmi)} กก./ม²</div>`;
+
+  if (Math.abs(z) > 5){
+    return head + `<div class="result">${big}</div><div class="box warn"><h3>${ICON("alert")}ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล</h3>z-score = ${sgn(z)} ซึ่งอยู่นอกช่วง ±5 มักเกิดจากการกรอกน้ำหนัก ส่วนสูง หรือวันเกิดผิด หากข้อมูลถูกต้อง ควรปรึกษาแพทย์</div>`;
+  }
+  const i = classifyZ(z, ref.bands), b = ref.bands[i];
+  const nLo = -2, nHi = m < 61 ? 2 : 1;
+  const bLo = sdVal(lms,nLo), bHi = sdVal(lms,nHi);
+  const pTxt = p < 1 ? "< 1" : p > 99 ? "> 99" : Math.round(p);
+  let out = head + `<div class="result">${big}${pill(b)}
+    <div class="zline">z-score <b>${sgn(z)}</b> · เปอร์เซ็นไทล์ที่ <b>${pTxt}</b></div></div>`;
+  out += scaleHTML(ref.bands, -4, 4, z, v => (v>0?"+":"")+v+" SD");
+  out += `<div class="info">ช่วง BMI สมส่วนสำหรับ${who}วัยนี้: <b>${f1(bLo)} – ${f1(bHi)}</b><br>
+    เทียบเป็นน้ำหนักที่ส่วนสูงปัจจุบัน: <b>${f1(bLo*hm*hm)} – ${f1(bHi*hm*hm)} กก.</b><br>
+    <span style="font-size:13px">เด็กยังเติบโต ช่วงนี้จึงเปลี่ยนไปตามอายุและส่วนสูง ใช้เพื่อติดตาม ไม่ใช่เป้าหมายลดหรือเพิ่มน้ำหนัก</span></div>`;
+  out += `<div class="box"><h3>${ICON("sprout")}คำแนะนำสำหรับผู้ปกครอง</h3>${b.tip}</div>`;
+  out += markRow(kidTable(ref.bands, lms), i);
+  return out;
+}
+
+function adultResult(bmi, hm, w){
+  const ref = ADULT[adultStd], bands = ref.bands;
+  let out = `<div class="seg adultseg" id="adultSeg">
+      <button type="button" data-std="asia" class="${adultStd==="asia"?"on":""}">เกณฑ์คนเอเชีย</button>
+      <button type="button" data-std="who" class="${adultStd==="who"?"on":""}">เกณฑ์ WHO สากล</button></div>
+    <div class="refname">${ref.label} · ผู้ใหญ่ เพศ${sex==="b"?"ชาย":"หญิง"}</div>`;
+  if (bmi < 10 || bmi > 80){
+    return out + `<div class="result"><div class="num">${f1(bmi)}</div></div><div class="box warn"><h3>${ICON("alert")}ค่าผิดปกติมาก — กรุณาตรวจสอบข้อมูล</h3>ค่า BMI นี้อยู่นอกช่วงที่พบได้ทั่วไป อาจกรอกน้ำหนักหรือส่วนสูงผิด</div>`;
+  }
+  const i = classifyBMI(bmi, bands), b = bands[i];
+  out += `<div class="result"><div class="num" style="color:${cv(b.c)}">${f1(bmi)}</div><div class="unit">กก./ม²</div>${pill(b)}</div>`;
+  out += scaleHTML(bands, 14, 40, bmi, v => v);
+  const lo = bands[0].hi*hm*hm, hi = bands[1].hi*hm*hm;
+  let diff = bmi < bands[0].hi ? `ต้องเพิ่มอีกประมาณ <b>${f1(lo-w)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`
+           : bmi >= bands[1].hi ? `ต้องลดอีกประมาณ <b>${f1(w-hi+0.1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`
+           : `อยู่ในเกณฑ์ปกติแล้ว 👍`;
+  out += `<div class="info">น้ำหนักที่เหมาะสมสำหรับส่วนสูง ${f1(hm*100)} ซม. คือ <b>${f1(lo)} – ${f1(hi-0.1)} กก.</b><br>${diff}</div><div class="box"><h3>${ICON("bulb")}คำแนะนำ</h3>${b.tip}</div>`;
+
+  const ws = parseFloat($("waist").value);
+  if (ws > 0){
+    const cut = sex==="b" ? 90 : 80, whtr = ws/(hm*100);
+    const okW = ws < cut, okR = whtr < 0.5;
+    out += `<div class="box ${okW&&okR?"":"warn"}"><h3>${ICON("tape")}รอบเอว</h3>
+      รอบเอว <b>${f1(ws)} ซม.</b> — ${okW ? "✅ อยู่ในเกณฑ์" : "⚠️ เกินเกณฑ์"} (${sex==="b"?"ชาย":"หญิง"}ควรน้อยกว่า ${cut} ซม.)<br>
+      รอบเอวต่อส่วนสูง <b>${whtr.toFixed(2)}</b> — ${okR ? "✅ อยู่ในเกณฑ์" : "⚠️ เกินเกณฑ์"} (ควรน้อยกว่า 0.5 หรือรอบเอวไม่เกินครึ่งหนึ่งของส่วนสูง)
+      ${okW&&okR ? "" : "<br>ไขมันหน้าท้องสูงเพิ่มความเสี่ยงโรคเบาหวานและโรคหัวใจ แม้ BMI จะปกติก็ตาม"}</div>`;
+  }
+  out += markRow(adultTable(bands), i);
+  return out;
+}
+changed();
 </script>
 </body>
 </html>
