@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>คำนวณ BMI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff4ea; --card:#ffffff; --ink:#3a1f0f; --muted:#8a6a55; --line:#f6d9c0;
+    --accent:#f26b1d; --accent-soft:#ffe3cc;
+    --c1:#5b8fd6; --c2:#3fa36b; --c3:#e0b23a; --c4:#e07b39; --c5:#c9443b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#1c130d; --card:#2a1c13; --ink:#fdeee2; --muted:#c29c80; --line:#4a3122; --accent:#ff8a3d; --accent-soft:#4a2a14; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;background:var(--bg);color:var(--ink);
+       min-height:100vh;display:flex;justify-content:center;padding:32px 16px}
+  main{width:100%;max-width:480px}
+  h1{font-size:28px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em;color:var(--accent)}
+  .card{box-shadow:0 8px 24px rgba(242,107,29,.10)}
+  .sub{color:var(--muted);margin:0 0 24px;font-size:15px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .seg{display:flex;background:var(--accent-soft);border-radius:10px;padding:4px;margin-bottom:18px}
+  .seg button{flex:1;border:0;background:transparent;color:var(--muted);font:inherit;font-size:14px;
+              padding:8px;border-radius:7px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  label{display:block;font-size:14px;font-weight:500;margin:14px 0 6px}
+  .field{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--bg);overflow:hidden}
+  .field:focus-within{border-color:var(--accent)}
+  .field input{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;font-size:20px;padding:12px 14px;outline:none;min-width:0}
+  .field span{padding:0 14px;color:var(--muted);font-size:14px}
+  input[type=range]{width:100%;accent-color:var(--accent);margin-top:8px}
+  .go{width:100%;margin-top:20px;border:0;border-radius:12px;padding:14px;font:inherit;font-size:18px;font-weight:600;
+      color:#fff;background:var(--accent);cursor:pointer;box-shadow:0 4px 14px rgba(242,107,29,.30);transition:transform .08s,filter .15s}
+  .go:hover{filter:brightness(1.06)}
+  .go:active{transform:scale(.98)}
+  .go.stale{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{50%{box-shadow:0 4px 22px rgba(242,107,29,.55)}}
+  #out{animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .result{margin-top:20px;text-align:center}
+  .num{font-size:56px;font-weight:700;line-height:1;letter-spacing:-.02em;transition:color .2s}
+  .cat{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:99px;font-weight:600;font-size:15px;color:#fff}
+  .bar{position:relative;display:flex;height:12px;border-radius:99px;overflow:hidden;margin:26px 0 6px}
+  .bar div{height:100%}
+  .marker{position:absolute;top:-6px;width:4px;height:24px;background:var(--ink);border-radius:2px;
+          transform:translateX(-50%);transition:left .3s ease}
+  .barwrap{position:relative}
+  .ticks{position:relative;height:16px;font-size:11px;color:var(--muted)}
+  .ticks span{position:absolute;transform:translateX(-50%)}
+  .info{margin-top:18px;font-size:14px;color:var(--muted);line-height:1.6;text-align:left;border-top:1px solid var(--line);padding-top:14px}
+  .info b{color:var(--ink)}
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+  td{padding:8px 4px;border-bottom:1px solid var(--line)}
+  td:last-child{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  tr.active td{font-weight:600;color:var(--ink)}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px;vertical-align:middle}
+  .note{font-size:12px;color:var(--muted);margin-top:16px;line-height:1.6}
+</style>
+</head>
+<body>
+<main>
+  <h1>คำนวณ BMI</h1>
+  <p class="sub">ดัชนีมวลกาย (Body Mass Index) = น้ำหนัก (กก.) ÷ ส่วนสูง (ม.)²</p>
+
+  <div class="card">
+    <div class="seg" role="tablist" aria-label="เกณฑ์">
+      <button id="stdAsia" class="on" type="button">เกณฑ์คนเอเชีย</button>
+      <button id="stdWho" type="button">เกณฑ์ WHO สากล</button>
+    </div>
+
+    <label for="h">ส่วนสูง</label>
+    <div class="field"><input id="h" type="number" inputmode="decimal" min="50" max="250" value="165"><span>ซม.</span></div>
+    <input id="hr" type="range" min="100" max="220" value="165" aria-label="ส่วนสูง">
+
+    <label for="w">น้ำหนัก</label>
+    <div class="field"><input id="w" type="number" inputmode="decimal" min="10" max="300" value="60"><span>กก.</span></div>
+    <input id="wr" type="range" min="30" max="150" value="60" aria-label="น้ำหนัก">
+
+    <button id="go" class="go" type="button">คำนวณ BMI</button>
+
+    <div id="out" hidden>
+    <div class="result" aria-live="polite">
+      <div class="num" id="bmi">–</div>
+      <div class="cat" id="cat">–</div>
+    </div>
+
+    <div class="barwrap">
+      <div class="bar" id="bar"></div>
+      <div class="marker" id="marker"></div>
+    </div>
+    <div class="ticks" id="ticks"></div>
+
+    <div class="info" id="info"></div>
+
+    <table id="tbl"></table>
+    </div>
+
+    <p class="note">BMI เป็นตัวชี้วัดเบื้องต้น ไม่ได้แยกกล้ามเนื้อกับไขมัน และไม่เหมาะกับเด็ก หญิงตั้งครรภ์ หรือนักกีฬา ควรปรึกษาแพทย์เพื่อประเมินสุขภาพที่แม่นยำ</p>
+  </div>
+</main>
+
+<script>
+const STD = {
+  asia: [
+    {name:"น้ำหนักน้อย / ผอม", max:18.5, color:"var(--c1)", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
+    {name:"ปกติ (สุขภาพดี)",   max:23,   color:"var(--c2)", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
+    {name:"ท้วม / โรคอ้วนระดับ 1", max:25, color:"var(--c3)", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
+    {name:"อ้วน / โรคอ้วนระดับ 2", max:30, color:"var(--c4)", tip:"เสี่ยงต่อเบาหวาน ความดันสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
+    {name:"อ้วนมาก / โรคอ้วนระดับ 3", max:Infinity, color:"var(--c5)", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}
+  ],
+  who: [
+    {name:"น้ำหนักน้อย", max:18.5, color:"var(--c1)", tip:"ควรเพิ่มพลังงานจากอาหารที่มีคุณค่า และออกกำลังกายเสริมสร้างกล้ามเนื้อ"},
+    {name:"ปกติ",        max:25,   color:"var(--c2)", tip:"รักษาระดับนี้ด้วยการกินอาหารครบหมู่และออกกำลังกายสม่ำเสมอ"},
+    {name:"น้ำหนักเกิน", max:30,   color:"var(--c3)", tip:"เริ่มมีความเสี่ยง ควรควบคุมอาหารและเพิ่มกิจกรรมทางกาย"},
+    {name:"อ้วนระดับ 1", max:35,   color:"var(--c4)", tip:"เสี่ยงต่อเบาหวาน ความดันสูง ควรปรับพฤติกรรมอย่างจริงจัง"},
+    {name:"อ้วนระดับ 2 ขึ้นไป", max:Infinity, color:"var(--c5)", tip:"มีความเสี่ยงสูง ควรปรึกษาแพทย์"}
+  ]
+};
+const MIN=14, MAX=40;
+let std="asia";
+const $=id=>document.getElementById(id);
+const pos=v=>((Math.min(Math.max(v,MIN),MAX)-MIN)/(MAX-MIN))*100;
+
+function drawScale(){
+  const s=STD[std]; let prev=MIN; let bar="", ticks="";
+  s.forEach(c=>{
+    const end=Math.min(c.max,MAX);
+    bar+=`<div style="width:${pos(end)-pos(prev)}%;background:${c.color}"></div>`;
+    if(c.max!==Infinity) ticks+=`<span style="left:${pos(c.max)}%">${c.max}</span>`;
+    prev=end;
+  });
+  $("bar").innerHTML=bar; $("ticks").innerHTML=ticks;
+}
+
+function calc(){
+  const h=parseFloat($("h").value), w=parseFloat($("w").value);
+  const s=STD[std];
+  if(!(h>0&&w>0)){ $("bmi").textContent="–"; $("cat").textContent="กรอกข้อมูล"; $("cat").style.background="var(--muted)"; return; }
+  const m=h/100, bmi=w/(m*m);
+  const i=s.findIndex(c=>bmi<c.max), c=s[i];
+  $("bmi").textContent=bmi.toFixed(1);
+  $("bmi").style.color=c.color;
+  $("cat").textContent=c.name; $("cat").style.background=c.color;
+  $("marker").style.left=pos(bmi)+"%";
+
+  const lo=s[0].max*m*m, hi=s[1].max*m*m;
+  let diff="";
+  if(bmi<s[0].max) diff=`ต้องเพิ่มอีกประมาณ <b>${(lo-w).toFixed(1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`;
+  else if(bmi>=s[1].max) diff=`ต้องลดอีกประมาณ <b>${(w-hi+0.1).toFixed(1)} กก.</b> เพื่อเข้าสู่เกณฑ์ปกติ`;
+  else diff=`คุณอยู่ในเกณฑ์ปกติแล้ว 👍`;
+  $("info").innerHTML=`น้ำหนักที่เหมาะสมสำหรับส่วนสูง ${h} ซม. คือ <b>${lo.toFixed(1)} – ${(hi-0.1).toFixed(1)} กก.</b><br>${diff}<br>${c.tip}`;
+
+  let p=0;
+  $("tbl").innerHTML=s.map((c,j)=>{
+    const r = c.max===Infinity ? `≥ ${p}` : (j===0 ? `< ${c.max}` : `${p} – ${(c.max-0.1).toFixed(1)}`);
+    p=c.max;
+    return `<tr class="${j===i?'active':''}"><td><span class="dot" style="background:${c.color}"></span>${c.name}</td><td>${r}</td></tr>`;
+  }).join("");
+}
+
+let shown=false;
+function markStale(){ if(shown) $("go").classList.add("stale"); }
+function link(num,range){
+  $(num).addEventListener("input",()=>{ $(range).value=$(num).value; markStale(); });
+  $(range).addEventListener("input",()=>{ $(num).value=$(range).value; markStale(); });
+  $(num).addEventListener("keydown",e=>{ if(e.key==="Enter") run(); });
+}
+function run(){
+  shown=true; $("out").hidden=false; $("go").classList.remove("stale");
+  drawScale(); calc();
+}
+link("h","hr"); link("w","wr");
+$("go").onclick=run;
+function setStd(k){ std=k; $("stdAsia").classList.toggle("on",k==="asia"); $("stdWho").classList.toggle("on",k==="who"); if(shown){ drawScale(); calc(); } }
+$("stdAsia").onclick=()=>setStd("asia");
+$("stdWho").onclick=()=>setStd("who");
+</script>
+</body>
+</html>
